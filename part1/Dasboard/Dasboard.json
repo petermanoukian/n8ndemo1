@@ -1,0 +1,158 @@
+{
+  "name": "Dasboard",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hAodQw9NWZkwJTY5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hAodQw9NWZkwJTY5",
+          "cachedResultName": "Logged In Guard Middleware"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        -176
+      ],
+      "id": "40618124-fdd9-4324-aa54-98b15df82d47",
+      "name": "Call 'Logged In Guard Middleware'",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dbf4d909-6c3f-447c-9bf9-e1f112bef9ad",
+              "leftValue": "={{ $json.isauthenticatedbysanctumfirstcheck }}",
+              "rightValue": "414",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "25a84e85-5455-44b7-a7b4-bd04e56783ad",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "reached"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -608,
+        -256
+      ],
+      "id": "d5214e64-ace3-4647-a11e-fcab5be00806",
+      "name": "When Executed by Another Workflow",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput",
+      "notes": "I reached here"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "17c7d498-a1b1-4b2d-874f-84b033be0409",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -672,
+        0
+      ],
+      "id": "337cbd7a-c592-4b47-a0ec-03ee67609d6f",
+      "name": "Webhook",
+      "webhookId": "17c7d498-a1b1-4b2d-874f-84b033be0409",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Call 'Logged In Guard Middleware'": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Call 'Logged In Guard Middleware'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cf17c114-6eb2-4b13-aa8c-e1457e32456c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "DvsX77K2nid2T8go",
+  "tags": []
+}

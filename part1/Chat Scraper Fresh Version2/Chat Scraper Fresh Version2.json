@@ -1,0 +1,566 @@
+{
+  "name": "Chat Scraper Fresh Version2",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -3280,
+        -688
+      ],
+      "id": "52a2b1a5-5c60-4dee-9953-1af6a7f58411",
+      "name": "When chat message received",
+      "webhookId": "c2dd978d-f3d9-410d-8c5a-3bb6fa6370f2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1612306-142e-4476-9ca6-db6b7ffcbd4b",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "441f619c-7d75-437a-b2b2-e2c5244e0537",
+              "name": "startTime",
+              "value": "={{ Date.now() }}",
+              "type": "number"
+            },
+            {
+              "id": "12e9958e-1a77-4419-ac41-8d7407975a65",
+              "name": "extractedUrl",
+              "value": "={{ $json.chatInput.match(/https?:\\/\\/[^\\s]+/)?.[0] || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "94ebcc66-6755-43db-b461-d645408fe654",
+              "name": "pageContent",
+              "value": "={{ { \"body\": '' } }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3072,
+        -688
+      ],
+      "id": "2bc96ded-0147-4667-9fde-b317741fd219",
+      "name": "Set Chat Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "16447f9d-4c09-40b9-85df-3c40c6c3a300",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "(https?:\\/\\/|www\\.)",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "74848775-77cf-43e5-955d-a5f79943328b",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "(scan|scrape|scrap|get\\s+content|info|information|retrieve|title|get\\s+em\\s+title)",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2864,
+        -688
+      ],
+      "id": "b6d8de10-4b7a-4ae6-95b7-4e8b438c43be",
+      "name": "Check for URL"
+    },
+    {
+      "parameters": {
+        "operation": "runCustomScript",
+        "scriptCode": "=const targetUrl = $input.first().json.chatInput.match(/https?:\\/\\/[^\\s]+/)?.[0] || '';\nif (!targetUrl) return [{ json: { title: 'No URL' } }];\n\nawait $page.setExtraHTTPHeaders({\n  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'\n});\n\nconst browser = await $puppeteer.launch({ headless: true, args: ['--no-sandbox'] });\nconst page = await browser.newPage();\nawait page.goto(targetUrl, { waitUntil: 'networkidle0', timeout: 45000 });\nawait new Promise(resolve => setTimeout(resolve, 5000));\n\nconst videoTitle = await page.evaluate(() => {\n  let titleEl = document.querySelector('h1.ytd-video-primary-info-renderer');\n  if (!titleEl) titleEl = document.querySelector('h1.title.style-scope.ytd-video-primary-info-renderer');\n  return titleEl ? titleEl.innerText.trim() : null;\n});\n\nconst pageTitle = await page.evaluate(() => document.title);\n\nawait browser.close();\n\nreturn [{ json: { title: videoTitle || pageTitle } }]; ",
+        "options": {}
+      },
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [
+        -2752,
+        -880
+      ],
+      "id": "b69318f8-3949-471f-b84f-cf9b8cac8735",
+      "name": "Puppeteer"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3e770444-8cf1-46be-bf61-c165ecd273eb",
+              "name": "chatInput",
+              "value": "={{ $node[\"Set Chat Input\"].json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "5a447875-5ce0-4c08-934c-52cab7746b8b",
+              "name": "pageContent",
+              "value": "={{ { \"body\": $json.title || 'fallback title' } }}",
+              "type": "object"
+            },
+            {
+              "id": "0c201e7b-dfac-439f-85df-c60dde2a707b",
+              "name": "extractedUrl",
+              "value": "={{ $node[\"Set Chat Input\"].json.extractedUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "43d2eb52-723c-46a2-9237-f1d88e2e9a12",
+              "name": "videoInfo",
+              "value": "={{ {} }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2512,
+        -896
+      ],
+      "id": "c92baeed-6ecf-4fae-9e7b-2475f3ef3dc1",
+      "name": "Pack for AI"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          },
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2192,
+        -736
+      ],
+      "id": "da680d3f-6117-47a0-acf0-8f8c5fa337bd",
+      "name": "Merge Branches"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e83c162b-02af-44fd-a877-542d8807c90c",
+              "name": "videoInfo",
+              "value": "={{ {} }}",
+              "type": "string"
+            },
+            {
+              "id": "b95e2626-f701-4574-adce-93cb454ad2a3",
+              "name": "pageContent",
+              "value": "={{ { \"body\": $json.title || 'fallback title' } }}",
+              "type": "object"
+            },
+            {
+              "id": "9ccd3cf2-3187-4dc6-bebf-508e38b3bbd9",
+              "name": "chatInput",
+              "value": "={{ $node[\"Set Chat Input\"].json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "c293af58-227d-420b-9730-ee5419907706",
+              "name": "extractedUrl",
+              "value": "={{ 'NONE' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2560,
+        -592
+      ],
+      "id": "e2f391ff-eeca-4789-b434-41dd99cb406b",
+      "name": "False Pasing Fields"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "## YOUR JOB: EXTRACT SCRAPED CONTENT OR PROVIDE GENERAL ASSISTANCE\n\n**CRITICAL INSTRUCTION:** When a URL is present in the user's request, content has ALREADY been scraped. NEVER say you cannot browse websites. ALWAYS use the scraped content provided.\n\n---\n\n## INPUT DATA:\n- User Request: {{ $json.chatInput }}\n- Scraped Content: {{ $json.pageContent.body || 'NO_CONTENT' }}\n- Video Info: {{ $json.videoInfo || '{}' }}\n- URL Detected: {{ $json.chatInput.match(/https?:\\/\\/[^\\s]+/)?.[0] || 'NONE' }}\n\n---\n\n## RESPONSE RULES:\n\n**STEP 1: Check for URL in request**\n- If URL is detected (URL Detected is NOT 'NONE'), proceed to STEP 2\n- If NO URL detected, proceed to STEP 3\n\n**STEP 2: URL Present - Use Scraped Content**\n- **IF** Scraped Content is NOT 'NO_CONTENT':\n  → Return: \"{{ $json.pageContent.body }}\"\n  → DO NOT add commentary or explanations\n  \n- **IF** Scraped Content IS 'NO_CONTENT':\n  → Return: \"I attempted to extract content from the provided URL, but no content was available. The page may be empty, require JavaScript, or be inaccessible.\"\n\n**STEP 3: No URL - General Chat Mode**\n- Act as a helpful AI assistant\n- Answer the user's request using your general knowledge\n- Provide informative, conversational responses\n- You MAY use external knowledge and reasoning\n\n---\n\n**EXAMPLES:**\n\n**Example 1:** \"title of: https://www.national-armenia.org/\"\n→ Returns: \" Nationalist Armenia Armenian national democratic socialists\"\n\n**Example 2:** \"can you give me information regarding https://www.national-armenia.org/\"\n→ Returns: \" Nationalist Armenia Armenian national democratic socialists\"\n\n**Example 3:** \"info https://www.national-armenia.org/\"\n→ Returns: \"Nationalist Armenia Armenian national democratic socialists\"\n\n**Example 4:** \"What is the capital of France?\"\n→ Returns: \"The capital of France is Paris.\"\n\n---\n\n**NEVER:**\n- Say you cannot browse websites when a URL is present\n- Say you cannot access external websites when a URL is present\n- Use hypothetical information when scraped content is available\n- Return just the URL"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1856,
+        -896
+      ],
+      "id": "a7179261-ca18-47b6-a22e-a3a30a7d62b9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        -528
+      ],
+      "id": "d50f7e51-5e88-48ef-a554-3982b3941075",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KJf8tt07cth4UefJ",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        -496
+      ],
+      "id": "76afbb65-25c6-4fc6-b11f-2aba981b36a9",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "CxYvMkMbr40cBdGm",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1424,
+        -784
+      ],
+      "id": "6d5772c5-eba2-430c-b2e5-1e5606b3cd5a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tble8kwQQhNzW48Hu",
+          "mode": "list",
+          "cachedResultName": "scrapperlog",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tble8kwQQhNzW48Hu"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat input": "={{ $json.chatInput }}",
+            "webiste": "={{ $json.extractedUrl }}",
+            "response": "={{ $json.output }}",
+            "Type": "={{ $json.extractedUrl && $json.extractedUrl !== 'NONE' ? 'Scrape Request' : 'Web Search' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat input",
+              "displayName": "chat input",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "webiste",
+              "displayName": "webiste",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "response",
+              "displayName": "response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -1360,
+        -528
+      ],
+      "id": "a10c5d33-5c46-4f2c-b84e-40f88d0fc309",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "461c3674-0381-43ef-bef0-ba971e7422a9",
+              "name": "message",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3152,
+        -544
+      ],
+      "id": "b5197601-70bb-425b-bca9-95331d55df74",
+      "name": "Chat Response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Set Chat Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Chat Input": {
+      "main": [
+        [
+          {
+            "node": "Check for URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for URL": {
+      "main": [
+        [
+          {
+            "node": "Puppeteer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "False Pasing Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Puppeteer": {
+      "main": [
+        [
+          {
+            "node": "Pack for AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pack for AI": {
+      "main": [
+        [
+          {
+            "node": "Merge Branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Branches": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "False Pasing Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge Branches",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "85cab490-fca0-41f5-863a-0c60e7d7a38d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "qG9OZvGeTzn8vr57",
+  "tags": []
+}
