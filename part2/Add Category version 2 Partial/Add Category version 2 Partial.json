@@ -1,0 +1,1181 @@
+{
+  "name": "Add Category version 2 Partial",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Add category",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "department",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Marketing"
+                  },
+                  {
+                    "option": "Sales"
+                  },
+                  {
+                    "option": "PR"
+                  },
+                  {
+                    "option": "HR"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Document",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "image/jpeg,image/png,image/gif,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            },
+            {
+              "fieldLabel": "Image",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "image/jpeg,image/png,image/gif"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -3760,
+        -384
+      ],
+      "id": "be3059a8-100d-4eac-be8d-67b39fb59d9d",
+      "name": "Adding category",
+      "webhookId": "e1184a87-3e6f-4a01-a2ef-875e864b415d",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2048,
+        -832
+      ],
+      "id": "23831165-0196-4779-8b7e-304885e4c37e",
+      "name": "finalmerge",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2880,
+        -592
+      ],
+      "id": "06c8ebb0-03e5-4e45-8bbf-73540613708a",
+      "name": "Merge two files",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "merging two filesss"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "Image",
+        "destinationKey": "ImageRaw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -3488,
+        -720
+      ],
+      "id": "3f560da2-69f6-4870-b88f-a3b62c60ccec",
+      "name": "Extract from Image",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "Document",
+        "destinationKey": "FileRaw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -3488,
+        16
+      ],
+      "id": "fd94a2e5-54a4-47c6-a060-b1723dfeb63d",
+      "name": "Extract from File",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput",
+      "notes": "file extract error"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "ImageRaw",
+        "binaryPropertyName": "ImageConverted",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -3120,
+        -720
+      ],
+      "id": "77d265c0-5a64-44fd-bfd9-72c0e2ada2ec",
+      "name": "Convert to Image",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "FileRaw",
+        "binaryPropertyName": "FileConverted",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -3200,
+        144
+      ],
+      "id": "9c43936e-9f47-4db1-bd1a-1dbec2fe0fcd",
+      "name": "Convert to File",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput",
+      "notes": "file convert error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9bc3f949-edcf-4321-8a69-90e2c2678875",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "6482c306-95c5-4dc8-93cb-e7b73e2ce553",
+              "name": "department",
+              "value": "={{ $json.department }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3440,
+        -384
+      ],
+      "id": "c27af83e-1b93-4c86-8243-ef45043a2e3a",
+      "name": "The text Values",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3136,
+        -208
+      ],
+      "id": "fe9bc931-0c07-4347-a9ba-8a8360ccf38d",
+      "name": "Text and Binary",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\n\n// Detect binary presence and force booleans\nconst imgNew  = !!item.binary?.ImageConverted;\nconst fileNew = !!item.binary?.FileConverted;\n\nconst imgOld  = !!item.binary?.ImageOriginal;\nconst fileOld = !!item.binary?.FileOriginal;\n\n// Build the output item\nconst out = {\n    json: {\n        imgNew,\n        fileNew,\n        imgOld,\n        fileOld\n    }\n};\n\n// Only copy existing binary if it exists\nif (item.binary) {\n    out.binary = item.binary;\n}\n\nreturn [out];\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2976,
+        -224
+      ],
+      "id": "62cc37aa-bae4-4cf8-8b05-5d82910f2856",
+      "name": "Checking the Image and Docuemnt Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"imgNew\"] === true && $json[\"fileNew\"] === true }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "9588c5a8-622f-46ff-ba98-1c419eb8ee41"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image and Docuemnt"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d6bc0e1f-7d63-4420-a554-fdad5b071afb",
+                    "leftValue": "={{ $json[\"imgNew\"] === true && $json[\"fileNew\"] === false }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "034f1d1f-a83c-4561-a7c9-74be7041ca82",
+                    "leftValue": "={{ $json[\"imgNew\"] === false && $json[\"fileNew\"] === true }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only File"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "77386751-04d3-4f62-af28-ec8118943a6a",
+                    "leftValue": "={{ $json[\"imgNew\"] === false && $json[\"fileNew\"] === false }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only Text"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2784,
+        -256
+      ],
+      "id": "cdfdd787-aa07-4bce-98a4-f5d5f69e1a9c",
+      "name": "Switch",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af8e7f75-83e8-4a97-b5eb-bfc021869bfa",
+              "name": "name",
+              "value": "={{ $('Adding category').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "79fa6808-7454-4c4e-925a-4dc66cc84e48",
+              "name": "department",
+              "value": "={{ $('Adding category').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "bcd0bbf9-e0a1-47b3-89c3-abe8f57af8d9",
+              "name": "filenew",
+              "value": "={{ $binary.FileConverted ? 'FileConverted' : null }}",
+              "type": "binary"
+            },
+            {
+              "id": "4fdcda9c-7e74-49c1-8ead-0e9f795adc0e",
+              "name": "imgnew",
+              "value": "={{ $binary.ImageConverted ? 'ImageConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2656,
+        -912
+      ],
+      "id": "39acdd18-7299-47a5-8130-95e2482ac59d",
+      "name": "Full",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "former2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af8e7f75-83e8-4a97-b5eb-bfc021869bfa",
+              "name": "name",
+              "value": "={{ $('Adding category').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "79fa6808-7454-4c4e-925a-4dc66cc84e48",
+              "name": "department",
+              "value": "={{ $('Adding category').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "4fdcda9c-7e74-49c1-8ead-0e9f795adc0e",
+              "name": "imgnew",
+              "value": "={{ $binary.ImageConverted ? 'ImageConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        -688
+      ],
+      "id": "71cd696a-17bc-4380-b6bc-e6ed4227715f",
+      "name": "Only Images",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "former2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Full').last().json.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Full').last().json.department }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "img",
+              "inputDataFieldName": "=ImageConverted"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "filer",
+              "inputDataFieldName": "FileConverted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        -832
+      ],
+      "id": "5d6e15c0-5949-4600-893b-5ea4b734158d",
+      "name": "HTTP Request Full",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2224,
+        -512
+      ],
+      "id": "5a1128e8-e057-4c7d-85eb-3d17c96cbc69",
+      "name": "finalmerge Images Text",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Only Images').last().json.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Only Images').last().json.department }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "img",
+              "inputDataFieldName": "=ImageConverted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1984,
+        -624
+      ],
+      "id": "5580d1a7-5243-41c8-b6e6-d359cfab42fe",
+      "name": "HTTP Request Images",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af8e7f75-83e8-4a97-b5eb-bfc021869bfa",
+              "name": "name",
+              "value": "={{ $('Adding category').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "79fa6808-7454-4c4e-925a-4dc66cc84e48",
+              "name": "department",
+              "value": "={{ $('Adding category').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "bcd0bbf9-e0a1-47b3-89c3-abe8f57af8d9",
+              "name": "filenew",
+              "value": "={{ $binary.FileConverted ? 'FileConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2560,
+        -48
+      ],
+      "id": "c4c3b8e0-760b-4aeb-bdab-d39a58ab4418",
+      "name": "Only File",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "former2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2080,
+        -80
+      ],
+      "id": "e70c7f2c-8bc2-4fa8-8d6a-2e28f7c70a54",
+      "name": "finalmerge File and Token",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Only File').last().json.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Only File').last().json.department }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "filer",
+              "inputDataFieldName": "FileConverted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1744,
+        -96
+      ],
+      "id": "a9a9827e-bae0-4341-b7ea-527f460d1f58",
+      "name": "HTTP Request File",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af8e7f75-83e8-4a97-b5eb-bfc021869bfa",
+              "name": "name",
+              "value": "={{ $('Adding category').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "79fa6808-7454-4c4e-925a-4dc66cc84e48",
+              "name": "department",
+              "value": "={{ $('Adding category').item.json.department }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2608,
+        384
+      ],
+      "id": "e650c5d8-5b5e-48f6-9a00-8f391f6a69b9",
+      "name": "OnlyText",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "former2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2144,
+        560
+      ],
+      "id": "58602dd4-b478-4610-898a-02456f1fd1f4",
+      "name": "finalmerge Text and Token1",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('OnlyText').last().json.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('OnlyText').last().json.department }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1840,
+        560
+      ],
+      "id": "41e7bbfd-2904-4912-b4db-ab2349a73d47",
+      "name": "HTTP Request Text",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2288,
+        -736
+      ],
+      "id": "8fe4a987-acce-4b97-a55a-8df72a750d05",
+      "name": "Call Centralized Settngs for images"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2256,
+        -1056
+      ],
+      "id": "03065ac1-c3f8-403c-ba22-4a7b0566d9cf",
+      "name": "Call Centralized Settings"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2288,
+        -336
+      ],
+      "id": "18a37c85-14c5-4fe0-87f0-1cb435352af0",
+      "name": "Call 'Centralized Database Settings'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2160,
+        224
+      ],
+      "id": "a97ea2e5-18c8-471d-bed8-654fbd15033a",
+      "name": "Call 'Centralized Database Settings'1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Adding category": {
+      "main": [
+        [
+          {
+            "node": "Extract from Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "The text Values",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "finalmerge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Full",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge two files": {
+      "main": [
+        [
+          {
+            "node": "Text and Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from Image": {
+      "main": [
+        [
+          {
+            "node": "Convert to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Image": {
+      "main": [
+        [
+          {
+            "node": "Merge two files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Merge two files",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "The text Values": {
+      "main": [
+        [
+          {
+            "node": "Text and Binary",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        []
+      ]
+    },
+    "Text and Binary": {
+      "main": [
+        [
+          {
+            "node": "Checking the Image and Docuemnt Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Checking the Image and Docuemnt Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Full",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Only Images",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Only File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OnlyText",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Full": {
+      "main": [
+        [
+          {
+            "node": "finalmerge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Call Centralized Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Images": {
+      "main": [
+        [
+          {
+            "node": "finalmerge Images Text",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Call Centralized Settngs for images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finalmerge Images Text": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only File": {
+      "main": [
+        [
+          {
+            "node": "finalmerge File and Token",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Call 'Centralized Database Settings'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finalmerge File and Token": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OnlyText": {
+      "main": [
+        [
+          {
+            "node": "finalmerge Text and Token1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Call 'Centralized Database Settings'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finalmerge Text and Token1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Centralized Settngs for images": {
+      "main": [
+        [
+          {
+            "node": "finalmerge Images Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Centralized Settings": {
+      "main": [
+        [
+          {
+            "node": "finalmerge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'": {
+      "main": [
+        [
+          {
+            "node": "finalmerge File and Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'1": {
+      "main": [
+        [
+          {
+            "node": "finalmerge Text and Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e5e14238-0fa4-411e-9262-c5255333ed2c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "fVac2PWo3roGvyJl",
+  "tags": []
+}
