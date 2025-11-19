@@ -1,0 +1,225 @@
+{
+  "name": "Add category Full Image and File",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        32,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        688,
+        240
+      ],
+      "id": "030a00b8-59ac-4eaf-8724-23511a7a9fad",
+      "name": "finalmerge",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af8e7f75-83e8-4a97-b5eb-bfc021869bfa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "79fa6808-7454-4c4e-925a-4dc66cc84e48",
+              "name": "department",
+              "value": "={{ $json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "bcd0bbf9-e0a1-47b3-89c3-abe8f57af8d9",
+              "name": "filenew",
+              "value": "={{ $binary.FileConverted ? 'FileConverted' : null }}",
+              "type": "binary"
+            },
+            {
+              "id": "4fdcda9c-7e74-49c1-8ead-0e9f795adc0e",
+              "name": "imgnew",
+              "value": "={{ $binary.ImageConverted ? 'ImageConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "ac74334c-6e2e-4240-a533-6c6e30db4233",
+      "name": "Full",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "former2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        64
+      ],
+      "id": "a8484299-f5ad-43ec-8769-061cecaa55c2",
+      "name": "Call 'Centralized Database Settings'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Full').last().json.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Full').last().json.department }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "img",
+              "inputDataFieldName": "=ImageConverted"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "filer",
+              "inputDataFieldName": "FileConverted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        880,
+        144
+      ],
+      "id": "e332c190-1841-4484-afe4-b1321cba8a0d",
+      "name": "Insert Cat To Laravel",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Full",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finalmerge": {
+      "main": [
+        [
+          {
+            "node": "Insert Cat To Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Full": {
+      "main": [
+        [
+          {
+            "node": "finalmerge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Call 'Centralized Database Settings'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'": {
+      "main": [
+        [
+          {
+            "node": "finalmerge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Cat To Laravel": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e0f9a115-692b-451b-a73f-92d2683b7c0d",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "Ey7TZP0ijov0nAlS",
+  "tags": []
+}

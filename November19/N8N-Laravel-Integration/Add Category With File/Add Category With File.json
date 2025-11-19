@@ -1,0 +1,209 @@
+{
+  "name": "Add Category With File",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "Add Category With File",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        96,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "af8e7f75-83e8-4a97-b5eb-bfc021869bfa",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "79fa6808-7454-4c4e-925a-4dc66cc84e48",
+              "name": "department",
+              "value": "={{ $json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "bcd0bbf9-e0a1-47b3-89c3-abe8f57af8d9",
+              "name": "filenew",
+              "value": "={{ $binary.FileConverted ? 'FileConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        288
+      ],
+      "id": "5037046a-44f5-410b-bda7-d3d874a2796f",
+      "name": "Only File",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "former2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        464,
+        464
+      ],
+      "id": "36529c54-4788-4539-9b65-ddf7d83316c9",
+      "name": "finalmerge File and Token",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Only File').last().json.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Only File').last().json.department }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "filer",
+              "inputDataFieldName": "FileConverted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        736,
+        336
+      ],
+      "id": "952f0de0-830b-41a9-9b9f-b3a3b47d1094",
+      "name": "HTTP Request File",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        192
+      ],
+      "id": "81232d4e-d4ce-4ef9-a715-612ec9d4c420",
+      "name": "Call 'Centralized Database Settings'2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Add Category With File": {
+      "main": [
+        [
+          {
+            "node": "Only File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only File": {
+      "main": [
+        [
+          {
+            "node": "finalmerge File and Token",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Call 'Centralized Database Settings'2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finalmerge File and Token": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'2": {
+      "main": [
+        [
+          {
+            "node": "finalmerge File and Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "98980412-0f4c-4590-8cf5-dee914613fab",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "aqw1yqfvgJqA1DY1",
+  "tags": []
+}
