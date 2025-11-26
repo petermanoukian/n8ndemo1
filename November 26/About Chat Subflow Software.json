@@ -1,0 +1,917 @@
+{
+  "name": "About Chat Subflow Software",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/rtf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -544,
+        208
+      ],
+      "id": "86e516a9-891d-4b06-b4b1-24b74fc8411e",
+      "name": "Download file",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "tKFhkQOgzK7W6JjC",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "POST",
+          "GET"
+        ],
+        "path": "About-Software-Chat",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1200,
+        0
+      ],
+      "id": "f23e80b5-e57a-4e9f-97be-6f6dbc73d490",
+      "name": "Webhook",
+      "webhookId": "6720e5b6-b963-46a0-93af-78726689de3f",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mimeType }}",
+                    "rightValue": "application/msword",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8a6e6580-1f24-469a-bcdc-5f6ed12604cc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Word RTF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dd93f616-3d2a-4d91-9608-234a9fba9579",
+                    "leftValue": "={{ $('Software Search files and folders').item.json.mimeType }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c5cff196-0d5f-45e8-b819-5750ef2f3ce3",
+                    "leftValue": "={{ $('Software Search files and folders').item.json.mimeType }}",
+                    "rightValue": "text/csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Google Sheets"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -144,
+        128
+      ],
+      "id": "c14c1e4d-807d-4748-bed9-a7b79e5966f3",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        160,
+        288
+      ],
+      "id": "fb65c0a1-182e-45de-8619-6852c864166c",
+      "name": "Extract from PDF",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -64
+      ],
+      "id": "9f3324f2-2a43-49fd-a703-4f817a55eb7f",
+      "name": "Extract from RTF",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f90989a-49c1-4c3d-8297-282abd45e1e7",
+              "name": "originalFileID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "86f0e8f4-b52d-4946-9874-1d0bd69c9834",
+              "name": "originalFileName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        288
+      ],
+      "id": "a2ae807a-8484-433c-8850-8c5b288bf6bd",
+      "name": "Get File ID",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "979a1d8f-2bbf-4b29-8c84-c74c1f380e21",
+              "name": "originalFileID",
+              "value": "={{ $json.originalFileID }}",
+              "type": "string"
+            },
+            {
+              "id": "3ca742f0-d346-45eb-b86e-79fd4ae3319c",
+              "name": "originalFileName",
+              "value": "={{ $json.originalFileName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        112
+      ],
+      "id": "50ec0061-2e63-4ed2-bb69-c8b25e11b1f0",
+      "name": "Tansform File Info"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1e5ad15-dd15-45e4-944c-206a67174220",
+              "name": "originalFileName",
+              "value": "={{ $json.originalFileName }}",
+              "type": "string"
+            },
+            {
+              "id": "8f00fa4d-b7ae-4b03-9356-1eb2f99e51d9",
+              "name": "originalFileID",
+              "value": "={{ $json.originalFileID }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        128
+      ],
+      "id": "e308599b-545d-4c2f-82ac-3bee79a1299e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d4c2582-edf3-424d-9e95-8c4af9eb2a76",
+              "name": "originalFileID",
+              "value": "={{ $json.originalFileID }}",
+              "type": "string"
+            },
+            {
+              "id": "772bc502-42d1-4ade-a6aa-9ead4c5da4f1",
+              "name": "originalFileName",
+              "value": "={{ $json.originalFileName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        480
+      ],
+      "id": "0bd4df61-cde3-44e5-9e21-9a7bbbfafdee",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const combinedContext = [];\n\nfor (const item of items) {\n\n    // RTF extraction → item.json.data\n    if (item.json.data) {\n        const rtf = item.json.data;\n\n        // lightweight RTF → text\n        let plain = rtf\n            .replace(/\\\\par[d]?/g, \"\\n\")\n            .replace(/\\\\[a-zA-Z]+\\d?/g, \"\")\n            .replace(/[{}]/g, \"\")\n            .trim();\n\n        const truncated = plain.substring(0, 500);\n\n        combinedContext.push(\n            `RTF DOCUMENT CONTENT (${item.json.name || \"Unknown File\"}) (Truncated):\\n${truncated}...`\n        );\n    }\n}\n\nreturn [{\n    json: {\n        rtf_ai_context: combinedContext.join(\"\\n\\n---\\n\\n\")\n    }\n}];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -48
+      ],
+      "id": "f02c33ba-0094-462b-ae44-2df61a0be62e",
+      "name": "RTF Text Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const downloadLinks = [];\n\nfor (const item of items) {\n    let fileId = null;\n    let fileName = null;\n\n    if (item.json.originalFileID) fileId = item.json.originalFileID;\n    else if (item.json.id) fileId = item.json.id;\n\n    if (item.json.originalFileName) fileName = item.json.originalFileName;\n    else if (item.json.name) fileName = item.json.name;\n\n    if (item.binary && item.binary.data && item.binary.data.fileName) {\n        fileName = item.binary.data.fileName;\n    }\n\n    if (fileId && fileName) {\n        const url = `https://drive.google.com/uc?export=download&id=${fileId}`;\n        downloadLinks.push(`- **${fileName}** → ${url}`);\n    }\n}\n\nreturn [{\n    json: {\n        rtf_download_list: downloadLinks.join(\"\\n\")\n    }\n}];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        112
+      ],
+      "id": "71bd732e-55f5-4474-aadf-18bf0940e132",
+      "name": "RTF Files Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const combinedContext = [];\n\nfor (const item of items) {\n\n    if (item.json.text) {\n        const truncated = item.json.text.substring(0, 500);\n\n        combinedContext.push(\n            `PDF DOCUMENT CONTENT (${item.json.name || \"Unknown File\"}) (Truncated):\\n${truncated}...`\n        );\n    }\n}\n\nreturn [{\n    json: {\n        pdf_ai_context: combinedContext.join(\"\\n\\n---\\n\\n\")\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        256
+      ],
+      "id": "18b2a9e9-bab8-4a01-8449-c78695f0dcd8",
+      "name": "PDF Text Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const downloadLinks = [];\n\nfor (const item of items) {\n    let fileId = null;\n    let fileName = null;\n\n    if (item.json.originalFileID) fileId = item.json.originalFileID;\n    else if (item.json.id) fileId = item.json.id;\n\n    if (item.json.originalFileName) fileName = item.json.originalFileName;\n    else if (item.json.name) fileName = item.json.name;\n\n    if (item.binary && item.binary.data && item.binary.data.fileName) {\n        fileName = item.binary.data.fileName;\n    }\n\n    if (fileId && fileName) {\n        const url = `https://drive.google.com/uc?export=download&id=${fileId}`;\n        downloadLinks.push(`- **${fileName}** → ${url}`);\n    }\n}\n\nreturn [{\n    json: {\n        pdf_download_list: downloadLinks.join(\"\\n\")\n    }\n}];\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        448
+      ],
+      "id": "dec5ce8c-721d-4211-a9b5-9ae1eb6c7ec1",
+      "name": "PDF Files Code"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        640,
+        -272
+      ],
+      "id": "9360adeb-da42-4ad6-8f58-d20b533504db",
+      "name": "RTF Merge",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        240
+      ],
+      "id": "ae497a96-8938-469f-afa7-c5c457eaeb65",
+      "name": "PDF Merge",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -320,
+        -464
+      ],
+      "id": "b35ce124-2d8d-41e6-b743-1ea60d67cf2e",
+      "name": "Final  Merge",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab012a2b-0603-4a58-8d54-2e3c5d27955f",
+              "name": "final_message",
+              "value": "=\nProduct: {{ $json['Product Name'] }}\n\nCategory:\n{{ $json.Category }}\n\nDepartment:\n{{ $json.Department }}\n\nDetails:\n{{ $json.Description }}\n\n{{ $json.cleanpdf }}\n\n{{ $json['Clean-RTF'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -432
+      ],
+      "id": "026849b8-361e-41c0-8608-aa16ea71d528",
+      "name": "Final Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.rtf_ai_context || \"\";\n\n// Remove \"(Unknown File)\" blocks + binary garbage\nlet cleaned = raw\n    .replace(/RTF DOCUMENT CONTENT\\s*\\(Unknown File\\).*?\\n/i, \"RTF DOCUMENT CONTENT:\\n\")\n    .replace(/[0-9]{10,}/g, \"\") // long garbage numbers\n    .replace(/\\\\[a-zA-Z]+\\d*/g, \"\") // rtf control words\n    .replace(/\\* [0-9a-zA-Z]{10,}/g, \"\") // huge * 000000 blocks\n    .replace(/-{3,}/g, \"\") // separators\n    .replace(/\\n{3,}/g, \"\\n\\n\") // too many new lines\n    .trim();\n\n// Clean download list\nlet dl = ($json.rtf_download_list || \"\")\n    .replace(/\\n{3,}/g, \"\\n\")\n    .trim();\n\nreturn {\n  rtf_ai_context: cleaned,\n  rtf_download_list: dl\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -368
+      ],
+      "id": "026650c2-0f38-47d3-9372-a6f79714c6b2",
+      "name": "Clean RTF"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.pdf_ai_context || \"\";\n\n// Remove (Unknown File) header and normalize\nlet cleaned = raw\n    .replace(/PDF DOCUMENT CONTENT\\s*\\(Unknown File\\).*?\\n/i, \"PDF DOCUMENT CONTENT:\\n\")\n    .replace(/-{3,}/g, \"\") // remove separators\n    .replace(/\\n{3,}/g, \"\\n\\n\") // normalize spacing\n    .trim();\n\n// Clean download list\nlet dl = ($json.pdf_download_list || \"\")\n    .replace(/\\n{3,}/g, \"\\n\")\n    .trim();\n\nreturn {\n  pdf_ai_context: cleaned,\n  pdf_download_list: dl\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        144
+      ],
+      "id": "44834906-42d4-448f-98f0-0c4a00c5ae14",
+      "name": "Clean PDF"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9f9734a-e764-465d-8bf6-9a68e7f54f06",
+              "name": "Clean-RTF",
+              "value": "={{ $json.rtf_ai_context }} \n{{ $json.rtf_download_list }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -368
+      ],
+      "id": "23872205-875e-496e-9cb7-b09a427e8c06",
+      "name": "Clean-RTF"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4feb2ef4-1ddd-4ff8-b998-813645d4a03f",
+              "name": "cleanpdf",
+              "value": "={{ $json.pdf_ai_context }}\n{{ $json.pdf_download_list }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        -112
+      ],
+      "id": "670d8be3-14a4-43c6-a9f1-97ab096e3e26",
+      "name": "Clean-PDF"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1CSMoMHjAlJVm_-fP_Y6niOHlxKNpeXPtGdSBJdRQBQM",
+          "mode": "list",
+          "cachedResultName": "Product Catalog (Hardware & Software) - N8N- Software",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CSMoMHjAlJVm_-fP_Y6niOHlxKNpeXPtGdSBJdRQBQM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1516261170,
+          "mode": "list",
+          "cachedResultName": "Software",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CSMoMHjAlJVm_-fP_Y6niOHlxKNpeXPtGdSBJdRQBQM/edit#gid=1516261170"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Product Name",
+              "lookupValue": "={{ $json.body.Search }}"
+            },
+            {
+              "lookupColumn": "Category",
+              "lookupValue": "={{ $json.body.Search }}"
+            },
+            {
+              "lookupColumn": "Department",
+              "lookupValue": "={{ $json.body.Search }}"
+            },
+            {
+              "lookupColumn": "Description",
+              "lookupValue": "={{ $json.body.Search }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -704,
+        -64
+      ],
+      "id": "498c863e-2cbd-4f96-a5f5-e42b751ed036",
+      "name": "Software Get row(s) in sheet",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.body.Search }}",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1zSThWMGGdo8kjUOtFuGPi88iSrssrOO1",
+            "mode": "list",
+            "cachedResultName": "Software",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1zSThWMGGdo8kjUOtFuGPi88iSrssrOO1"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {
+          "fields": [
+            "mimeType",
+            "name",
+            "id"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -864,
+        336
+      ],
+      "id": "ad9dcf03-ef88-461d-816c-627ae59d25be",
+      "name": "Software Search files and folders",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "tKFhkQOgzK7W6JjC",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": "google drive operation"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "content-type": "application/json",
+            "user-agent": "axios/1.12.0",
+            "content-length": "29",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "localhost:5678",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "Search": "Software Catalog"
+          },
+          "webhookUrl": "http://localhost:5678/webhook/About-Software-Chat",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Software Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Software Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Tansform File Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from RTF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from PDF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Extract from PDF": {
+      "main": [
+        [
+          {
+            "node": "PDF Text Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from RTF": {
+      "main": [
+        [
+          {
+            "node": "RTF Text Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File ID": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tansform File Info": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "RTF Files Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "PDF Files Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RTF Text Code": {
+      "main": [
+        [
+          {
+            "node": "RTF Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RTF Files Code": {
+      "main": [
+        [
+          {
+            "node": "RTF Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "PDF Text Code": {
+      "main": [
+        [
+          {
+            "node": "PDF Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Files Code": {
+      "main": [
+        [
+          {
+            "node": "PDF Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RTF Merge": {
+      "main": [
+        [
+          {
+            "node": "Clean RTF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF Merge": {
+      "main": [
+        [
+          {
+            "node": "Clean PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final  Merge": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Clean RTF": {
+      "main": [
+        [
+          {
+            "node": "Clean-RTF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean PDF": {
+      "main": [
+        [
+          {
+            "node": "Clean-PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean-RTF": {
+      "main": [
+        [
+          {
+            "node": "Final  Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Clean-PDF": {
+      "main": [
+        [
+          {
+            "node": "Final  Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Software Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Final  Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Software Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Get File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7d1f4ab3-b0a7-494f-9746-acfc0da63b95",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "jiaB6UnUrFkt1Zn1",
+  "tags": []
+}
