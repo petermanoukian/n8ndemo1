@@ -1,0 +1,560 @@
+{
+  "name": "MCP Resource HR Google Sheet Google Drive",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -304,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1tB6w4fAPj0S51xcKOOCQ-ZFjyiMJfNQuwAfj26oV9iI",
+          "mode": "list",
+          "cachedResultName": "N8N Categories Through MCP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tB6w4fAPj0S51xcKOOCQ-ZFjyiMJfNQuwAfj26oV9iI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 229883588,
+          "mode": "list",
+          "cachedResultName": "HR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tB6w4fAPj0S51xcKOOCQ-ZFjyiMJfNQuwAfj26oV9iI/edit#gid=229883588"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id }}",
+            "Name": "={{ $json.name }}",
+            "Department": "={{ $json.name }}",
+            "Image": "={{ $json.img }}",
+            "File": "={{ $json.filer }}",
+            "Date Created": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        160
+      ],
+      "id": "08791ae1-a1b7-4a8f-9380-780c59abf529",
+      "name": "HR",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.File }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1WMJ1m8As0-n85FjIM7YnD1OBSg4p1VkX",
+            "mode": "list",
+            "cachedResultName": "HR",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1WMJ1m8As0-n85FjIM7YnD1OBSg4p1VkX"
+          }
+        },
+        "options": {
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        768,
+        48
+      ],
+      "id": "71e120f0-6f0b-43e1-a54d-020822887569",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zlniUrJBkZu2JdPG",
+          "name": "Google Drive N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fileName = item.json.File;\n  if (!fileName || fileName.trim() === \"\") {\n    return { json: { File: null, fileExists: false } };\n  }\n  return { json: { File: fileName, fileExists: true } };\n});\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        32
+      ],
+      "id": "60762de6-bff7-4719-88d5-c861d7f81887",
+      "name": "Check File exists Then Retrieve Name",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d5e53086-733c-44ae-ba5c-96e7265356a9",
+              "leftValue": "={{ $json.File }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        656
+      ],
+      "id": "62beed1d-9baa-4e64-ae03-72440f0d78bd",
+      "name": "If File NOT Empty",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $json.batchSize }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        240,
+        48
+      ],
+      "id": "a8f34995-b69c-4a28-be50-29f3049bccbc",
+      "name": "Loop Over Items",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const itemCount = items.length;\nreturn [{ json: { batchSize: itemCount } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        512
+      ],
+      "id": "4136f938-2ee3-4635-b87b-4e5c42a1dd7b",
+      "name": "Count of Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fullUrl = item.json.File;\n  const fileName = fullUrl ? fullUrl.split('/').pop() : null;\n  return { json: { File: fileName } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        352
+      ],
+      "id": "70454096-1b60-4963-9970-57a01726db7a",
+      "name": "Get Relative File Name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf8568d6-be51-41d6-918f-5c33fece7bf8",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        80
+      ],
+      "id": "6425a4d2-3157-488b-ac1d-8fce98d9a101",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect expected full URLs from DB/list\nconst expected = items\n  .map(i => (i.json.File || '').trim())\n  .filter(v => v.length > 0);\n\n// Collect found names from Drive search\nconst foundNames = items\n  .map(i => (i.json.name || '').trim())\n  .filter(v => v.length > 0);\n\n// Build a set of found names for fast lookup\nconst foundSet = new Set(foundNames);\n\n// Filter expected URLs: keep only those whose basename is not in Drive\nconst missing = expected.filter(url => {\n  const baseName = url.split('/').pop();\n  return !foundSet.has(baseName);\n});\n\n// Return missing files with full URL for downstream upload\nreturn missing.map(url => ({\n  json: {\n    File: url,\n    Original: url\n  }\n}));\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        368
+      ],
+      "id": "6b0621c5-2d53-4d5e-b9be-ef685fb19a75",
+      "name": "Only New Files"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86248e5c-df9d-4096-b69c-bd9ae0c2aefb",
+              "name": "Original",
+              "value": "={{ $json.File }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        592
+      ],
+      "id": "a5051e35-b8fb-4f6e-88e5-72f3605e1d83",
+      "name": "FullFile"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        864,
+        592
+      ],
+      "id": "7b55d580-25f1-4ea1-a0af-9ff0d1bfcfc6",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Original }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1296,
+        336
+      ],
+      "id": "f27f9331-86f8-4df3-9290-409a04113654",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{ $json.Original.split('/').pop() }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1WMJ1m8As0-n85FjIM7YnD1OBSg4p1VkX",
+          "mode": "list",
+          "cachedResultName": "HR",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WMJ1m8As0-n85FjIM7YnD1OBSg4p1VkX"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1520,
+        336
+      ],
+      "id": "5295b956-528c-4d5e-b98e-70a80dfb1fc8",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zlniUrJBkZu2JdPG",
+          "name": "Google Drive N8N"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check File exists Then Retrieve Name": {
+      "main": [
+        [
+          {
+            "node": "If File NOT Empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If File NOT Empty": {
+      "main": [
+        [
+          {
+            "node": "Get Relative File Name",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FullFile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Check File exists Then Retrieve Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count of Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Relative File Name": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only New Files": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FullFile": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Only New Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR": {
+      "main": [
+        [
+          {
+            "node": "Count of Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a43c6d26-32f6-4706-941d-49de985d82a3",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "FEIOCSMd3xOQ6XwZ",
+  "tags": []
+}

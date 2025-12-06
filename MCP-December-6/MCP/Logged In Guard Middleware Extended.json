@@ -1,0 +1,303 @@
+{
+  "name": "Logged In Guard Middleware Extended",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -64
+      ],
+      "id": "d4f3e729-40cc-4de6-9aea-306fb83f4098",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbf06720-82a4-4b0b-89c2-d11315d9851a",
+              "leftValue": "={{ Number($json.isauthenticatedbysanctumfirstcheck) }}",
+              "rightValue": "414",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -64
+      ],
+      "id": "abc423b7-8fe2-407c-b444-663d023ea9e0",
+      "name": "If Logged in"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmcZeAoJSPeCoNx",
+          "mode": "list",
+          "cachedResultName": "secrettable",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblmcZeAoJSPeCoNx"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $json.MyIP }}\"\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        -160
+      ],
+      "id": "6f8cea28-8dd3-48d8-8c97-9f124ebe1bfa",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -112
+      ],
+      "id": "9ed47c08-ed01-4b7a-8ba8-c0c107dbb7b5",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "8323203e-d06f-4243-bfe9-223f314d1e06",
+      "name": "Datatabel Central Settings"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Redirecting...</title>\n\n  <meta http-equiv=\"refresh\" content=\"3; url={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/73c72dd0-6e4a-414e-9ad8-cf9524371a11\">\n</head>\n<body style=\"font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f8ff;\">\n  <h2>We wil take you to the login page now</h2>\n  <p>Now we wil go to the login form in a moment...</p>\n<p>The link is: \n\n<a href = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/73c72dd0-6e4a-414e-9ad8-cf9524371a11' target ='_blank'> \n\n&raquo; Laravel Login </a> </p>\n  <p id=\"status\" style=\"color: #666;\">If it doesn't open, you'll be redirected shortly.</p>\n  \n  <script>\n    (function() {\n      const formUrl = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/73c72dd0-6e4a-414e-9ad8-cf9524371a11';\n      \n      // Try to open in new window immediately (most browsers allow in response context)\n      const newWindow = window.open(formUrl, '_blank', 'width=600,height=700,scrollbars=yes,resizable=yes');\n      \n      if (newWindow) {\n        // Success: Update status and close this tab after delay\n        document.getElementById('status').textContent = 'Form opened in new window! Closing this page...';\n        setTimeout(() => { window.close(); }, 2000);\n      } else {\n        // Blocked: Rely on meta redirect (current tab jumps to form)\n        document.getElementById('status').textContent = 'Popup blocked—redirecting to form now.';\n      }\n    })();\n  </script>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        480,
+        240
+      ],
+      "id": "174de911-9373-451d-b2d0-d31ae417ee49",
+      "name": "redirect to login"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API }}/check-auth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" +$json.token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        512,
+        -176
+      ],
+      "id": "73dcc773-a13d-4fae-8c3a-81d92c600be9",
+      "name": "check authenthcation",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0419401-4284-47fc-b52c-205ec03be0c9",
+              "name": "token",
+              "value": "={{ $('Retrieve Token By IP Address').item.json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "bc167602-4c40-4ace-86ba-5f615bd6c44a",
+              "name": "LARAVEL_BACKEND_IP",
+              "value": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API }}",
+              "type": "string"
+            },
+            {
+              "id": "da890c79-57e9-4582-87d7-8a0c47797107",
+              "name": "LARAVEL_BACKEND",
+              "value": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND }}",
+              "type": "string"
+            },
+            {
+              "id": "200d8df9-48f4-4c8c-9854-31ca0340881b",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API }}",
+              "type": "string"
+            },
+            {
+              "id": "8e583383-ee20-4288-ab45-3c904be1c834",
+              "name": "LARAVEL_BACKEND_MCP",
+              "value": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_MCP }}",
+              "type": "string"
+            },
+            {
+              "id": "c6bfe1e8-7803-4bbe-a81e-a21c3ebe8b78",
+              "name": "isauthenticatedbysanctumfirstcheck",
+              "value": "={{ $json.isauthenticatedbysanctumfirstcheck }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        -144
+      ],
+      "id": "cffc7cb3-24de-4259-ae4e-930e00a4e5b7",
+      "name": "token and settings"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If Logged in": {
+      "main": [
+        [
+          {
+            "node": "token and settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "redirect to login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Token By IP Address": {
+      "main": [
+        [
+          {
+            "node": "check authenthcation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Token By IP Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatabel Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check authenthcation": {
+      "main": [
+        [
+          {
+            "node": "If Logged in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Datatabel Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3945e29d-56f8-41ed-bb0c-d4b27b8f91d1",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "wRyw7DyTlioKKc5i",
+  "tags": []
+}

@@ -1,0 +1,1473 @@
+{
+  "name": "Add category through chat",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\n- Would you like to add a category?\n- Would you like to view our categories?\n- Would you like to find out about us?\n",
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -3968,
+        -672
+      ],
+      "id": "13b2f4d5-2b2e-4cd6-843f-af5a9b03791d",
+      "name": "When chat message received",
+      "webhookId": "bc7bb23f-edb7-4a9e-81dc-99cf5d8970d7",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "message": "Helo there,\n- Would you like to add a category?\n- Would you like to view our categories?\n- Would you like to find out about us?\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -3936,
+        -1200
+      ],
+      "id": "702af372-605b-43ea-a98d-4c78495a5544",
+      "name": "Respond to Chat",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are a reliable chat classifier bot. Your sole task is to analyze the user's latest input and classify their intent into a structured JSON format with a single key: \"Action\".\n\n**Input Analysis and Classification Rules:**\n\n1.  **Greeting Intent:**\n    * **User Input:** If the user's input is a common greeting (e.g., \"hello\", \"hi\", \"good day\", \"good morning\", \"good evening\", or similar), **you must perform the action yourself:** Greet the user and display the main menu options exactly as listed below.\n        * - Would you like to add a category?\n        * - Would you like to view our categories?\n        * - Would you like to find out about us?\n    * **Output JSON:** Do NOT output a JSON. Output ONLY the greeting and the menu text.\n\n2.  **Menu Option Intent (Case-Insensitive & Flexible Matching):**\n    * For all other inputs (i.e., not a simple greeting), you must determine the user's choice and output a JSON. Be flexible and forgiving with spelling mistakes and similar phrases.\n    * **Option 1 (Action: Add):** User inputs \"1\", \"option 1\", \"add\", \"add a category\", \"insert category\", \"new categories\", or similar phrase.\n        * **Output JSON:** `{\"Action\": \"Add\"}`\n    * **Option 2 (Action: View):** User inputs \"2\", \"option 2\", \"view categories\", \"list categories\", or similar phrase.\n        * **Output JSON:** `{\"Action\": \"View\"}`\n    * **Option 3 (Action: About):** User inputs \"3\", \"option 3\", \"Find out about us\", \"find out more\", or similar phrase.\n        * **Output JSON:** `{\"Action\": \"About\"}`\n\n3.  **Fallback Intent:**\n    * **User Input:** If the input does not match any of the above intents (i.e., not a greeting and not a recognized menu choice), the user must be routed back to the main menu.\n    * **Output JSON:** `{\"Action\": \"Fallback\"}`\n\n**Important:** The workflow will proceed to the next node immediately after your output. Ensure that if the intent is not a greeting, you output only the JSON and nothing else, as the next node will use this JSON for routing."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -3424,
+        -1664
+      ],
+      "id": "4b3bf3f0-002e-4203-b1de-6ed2d101ae67",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3440,
+        -1424
+      ],
+      "id": "948d8b88-dd9d-4ae3-b459-84fc337a34df",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KJf8tt07cth4UefJ",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -3280,
+        -1408
+      ],
+      "id": "2232383e-2167-4b9a-ab7d-65da0839d23c",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "CxYvMkMbr40cBdGm",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -3056,
+        -1408
+      ],
+      "id": "41f33031-58b9-4dde-8417-b844b6afee4f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "faa5044c-d917-49b5-add4-039cb9839cd5",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "\"Action\"",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2720,
+        -1424
+      ],
+      "id": "14f1fee5-078b-4e1e-9623-634db71ffb3f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to extract the JSON string from the AI Agent output\nconst extractJsonString = (rawOutput) => {\n    // The output often starts with \"```json\\n\" and ends with \"\\n```\"\n    // We remove these wrappers to get the clean JSON string.\n    let jsonString = rawOutput.trim();\n    if (jsonString.startsWith('```json')) {\n        jsonString = jsonString.substring(7); // Remove '```json'\n    }\n    if (jsonString.endsWith('```')) {\n        jsonString = jsonString.substring(0, jsonString.length - 3); // Remove '```'\n    }\n    return jsonString.trim();\n};\n\n// Iterate over each item passed to the Code node (should be only one item)\nfor (const item of items) {\n    // 1. Get the string output from the previous node (AI Agent)\n    const rawOutput = item.json.output;\n    \n    // 2. Clean the string to isolate the pure JSON content\n    const cleanJsonString = extractJsonString(rawOutput);\n    \n    // 3. Parse the clean string into a JavaScript object\n    let parsedJson = {};\n    try {\n        parsedJson = JSON.parse(cleanJsonString);\n    } catch (e) {\n        // If parsing fails (shouldn't happen if the AI Agent is reliable)\n        console.error(\"Failed to parse JSON string:\", cleanJsonString, e);\n        // Default to Fallback if parsing fails\n        parsedJson.Action = 'Fallback'; \n    }\n    \n    // 4. Replace the existing output object with the newly parsed object\n    // This allows the next node (Switch) to read $json.Action easily.\n    item.json = parsedJson;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3568,
+        -1072
+      ],
+      "id": "1a8bd04a-1018-475a-8c69-0991510025a8",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Action }}",
+                    "rightValue": "Add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f9fa3596-e7cf-456a-9ab5-efbd629c7a2f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Add Categories"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f1c82803-a380-4038-8a4c-126362fcce2f",
+                    "leftValue": "={{ $json.Action }}",
+                    "rightValue": "View",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "List Categories"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8d55c091-5d71-4739-b488-feeed8995c56",
+                    "leftValue": "={{ $json.Action }}",
+                    "rightValue": "About",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "About"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9dbd5934-5c7c-4a1e-8797-ba0a524e8e7a",
+                    "leftValue": "={{ $json.Action }}",
+                    "rightValue": "Fallback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fallback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -3504,
+        -832
+      ],
+      "id": "c3d97f86-a724-4f56-8530-5ac326141d5a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "message": "What is the name of the new category you would like to add?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -3360,
+        -1248
+      ],
+      "id": "37266033-ecb2-4cd0-9a92-29cbb3721b12",
+      "name": "Respond to Chat1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "message": "What is the name of teh department, you may leave blank\nDepartments\n\n-Sales\n-Marketing\n-HR\n-PR\n-None",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -2784,
+        -1200
+      ],
+      "id": "0b91d704-37f4-466d-91ae-31dc2c59b7eb",
+      "name": "Respond to Chat2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define the list of valid departments (case-insensitive)\nconst VALID_DEPARTMENTS = [\n    'sales', \n    'marketing', \n    'pr', \n    'hr'\n];\n\nfor (const item of items) {\n    const rawDepartmentInput = item.json.chatInput;\n    const normalizedInput = rawDepartmentInput ? rawDepartmentInput.toLowerCase().trim() : '';\n    \n    // Initialize to empty string. This is the default for 'None', invalid input, or empty input.\n    let finalDepartmentValue = ''; \n    \n    // Check if the input is one of the four valid departments\n    if (VALID_DEPARTMENTS.includes(normalizedInput)) {\n        // Only capitalize if it's a valid department\n        finalDepartmentValue = normalizedInput.charAt(0).toUpperCase() + normalizedInput.slice(1);\n    } \n    // The previous 'else if (normalizedInput === \"none\")' is no longer needed \n    // because it correctly falls through and remains finalDepartmentValue = '';\n    \n    // Attach the validated department ('' for None/Invalid, 'Sales' for valid)\n    item.json.department = finalDepartmentValue;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2560,
+        -1200
+      ],
+      "id": "fdb2cc4e-9bed-4916-b492-342f7e979248",
+      "name": "Department Validation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define flexible matching rules (lowercase)\nconst VIEW_MATCHING_RULES = {\n    // Exact Matches\n    'sales': 'Sales',\n    'marketing': 'Marketing',\n    'pr': 'PR',\n    'hr': 'HR',\n    'all': 'All',\n    'blank': '' // Empty string represents 'Blank' or 'None'\n};\n\n// Define flexible synonym matching (lowercase)\nconst SYNONYMS = {\n    'sale': 'Sales',\n    'salees': 'Sales',\n    'mark': 'Marketing',\n    'markeet': 'Marketing',\n    'public relation': 'PR',\n    'public relations': 'PR',\n    'human resource': 'HR',\n    'human resources': 'HR',\n    'all of them': 'All',\n    'no department': '',\n    'no departments': '',\n    'none': ''\n};\n\nfor (const item of items) {\n    const rawInput = item.json.chatInput;\n    const normalizedInput = rawInput ? rawInput.toLowerCase().trim() : '';\n    let finalDepartmentValue = 'All'; // Default to 'All' as per your requirement\n\n    // 1. Check for exact matches (including 'Sales', 'All', 'Blank')\n    if (VIEW_MATCHING_RULES[normalizedInput]) {\n        finalDepartmentValue = VIEW_MATCHING_RULES[normalizedInput];\n    } \n    // 2. Check for synonyms/flexible matches\n    else if (SYNONYMS[normalizedInput]) {\n        finalDepartmentValue = SYNONYMS[normalizedInput];\n    }\n\n    // Any other input (like typos) remains 'All' due to the initialization.\n    item.json.viewDepartment = finalDepartmentValue;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        128
+      ],
+      "id": "c006628e-8717-4c84-a5bd-f65f892ce807",
+      "name": "Retrieve Department"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "84d67b14-2d58-47b6-b741-56b2eee6676e",
+              "name": "catname",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3008,
+        -1216
+      ],
+      "id": "2ec8d6fe-b06a-45e8-a285-ac4f74f87fbc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2288,
+        -1200
+      ],
+      "id": "2d99f2f7-7110-41c0-b493-e5ce8902e5b8",
+      "name": "Call 'Centralized Database Settings'1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/chatinsertcategory",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Department",
+              "value": "={{ $('Department Validation').item.json.department }}"
+            },
+            {
+              "name": "catname",
+              "value": "={{ $('Edit Fields').item.json.catname }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2080,
+        -1200
+      ],
+      "id": "8efb4af3-6881-421d-ac93-2662c7278a3c",
+      "name": "Call Add Category Chat"
+    },
+    {
+      "parameters": {
+        "message": "Which Category do you want to view\n-Marketing\n-Sales\n-HR\n-PR\n-All\n-None",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -3232,
+        -1024
+      ],
+      "id": "6b3f05c1-35e8-4f2f-b9ba-b2a7d8a28bc1",
+      "name": "Respond to Chat3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0efe3022-d4c0-4e53-b515-7d55e8c59d71",
+              "name": "department",
+              "value": "={{ $json.viewDepartment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2512,
+        -1040
+      ],
+      "id": "cf2f9144-8d03-43e0-a3d4-e809d4fd2a08",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define flexible matching rules (lowercase)\nconst VIEW_MATCHING_RULES = {\n    // Valid Department Mappings (map to Title Case)\n    'sales': 'Sales',\n    'marketing': 'Marketing',\n    'pr': 'PR',\n    'hr': 'HR',\n    'all': '',\n    // None/Blank Mappings (map to the REQUIRED lowercase string 'none')\n    'none': 'none',    // <--- FINAL CHANGE: 'none'\n    'blank': 'none'    // <--- FINAL CHANGE: 'none'\n};\n\n// Define flexible synonym matching (lowercase)\nconst SYNONYMS = {\n    // Sales synonyms\n    'sale': 'Sales', 'salees': 'Sales', 'sold items': 'Sales',\n    // Marketing synonyms\n    'mark': 'Marketing', 'markeet': 'Marketing', 'promotion': 'Marketing',\n    // PR synonyms\n    'public relation': 'PR', 'public relations': 'PR',\n    // HR synonyms\n    'human resource': 'HR', 'human resources': 'HR',\n    // 'All' synonyms\n    'all of them': 'All', 'all categories': 'All',\n    // 'None'/'Blank' synonyms (map to the REQUIRED lowercase string 'none')\n    'no department': 'none',     // <--- FINAL CHANGE: 'none'\n    'no departments': 'none',    // <--- FINAL CHANGE: 'none'\n    'empty': 'none'              // <--- FINAL CHANGE: 'none'\n};\n\nfor (const item of items) {\n    const rawInput = item.json.chatInput;\n    const normalizedInput = rawInput ? rawInput.toLowerCase().trim() : '';\n    \n    // Initialize to 'All'. This is the desired default for any non-matched input (typos).\n    let finalDepartmentValue = 'All'; \n\n    // 1. Check for specific matches in the fixed list\n    if (VIEW_MATCHING_RULES[normalizedInput] !== undefined) {\n        finalDepartmentValue = VIEW_MATCHING_RULES[normalizedInput];\n    } \n    // 2. Check for matches in the synonyms list\n    else if (SYNONYMS[normalizedInput] !== undefined) {\n        finalDepartmentValue = SYNONYMS[normalizedInput];\n    }\n    \n    // 3. If no match was found, finalDepartmentValue remains 'All'.\n\n    // Output the clean department value\n    item.json.viewDepartment = finalDepartmentValue;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2736,
+        -1024
+      ],
+      "id": "fb89b398-6bc3-4972-8335-ee3352c83b75",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2272,
+        -992
+      ],
+      "id": "8435baea-1994-4129-b0fa-f0c37c871089",
+      "name": "Call 'Centralized Database Settings'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68299792-535b-41a5-b876-e0089ad7dd62",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "753b6adc-059e-411b-8309-cb06c134ed3a",
+              "name": "LARAVEL_BACKEND_IP",
+              "value": "={{ $json.LARAVEL_BACKEND }}",
+              "type": "string"
+            },
+            {
+              "id": "899af7f4-56a7-49ba-acc7-0b4e4cb8598c",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $json.N8N_FRONTEND }}",
+              "type": "string"
+            },
+            {
+              "id": "1187968c-e0f1-4731-bb45-4900aaf9e83b",
+              "name": "department",
+              "value": "={{ $('Edit Fields1').item.json.department }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2000,
+        -1056
+      ],
+      "id": "7453fcab-e1d8-4df0-a901-c0fc1905296d",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "A7phypL4m1wVXjqb",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/A7phypL4m1wVXjqb",
+          "cachedResultName": "Retrieve categories direct for preseneting"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1824,
+        -1040
+      ],
+      "id": "732ee926-6fe2-4b3e-ba0c-a4970b49bad5",
+      "name": "Call 'Retrieve categories direct for preseneting'"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json['Final Message'] }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1584,
+        -1024
+      ],
+      "id": "f432fc16-3263-4800-b4fd-addbd207770b",
+      "name": "Respond to Chat5"
+    },
+    {
+      "parameters": {
+        "message": "Which area would you like to investigate?\n\n- **Software** (Programs, Code, IDE, Analytics)\n- **Hardware** (Desktops, Laptops, Accessories, Mouse)\n- **General** (Everything, All, Any other answer)",
+        "options": {
+          "memoryConnection": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -3232,
+        -848
+      ],
+      "id": "d64913da-033e-4d93-9ed0-775415162f44",
+      "name": "Respond to Chat4"
+    },
+    {
+      "parameters": {
+        "message": "Sorry i dont get your message",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -3504,
+        -400
+      ],
+      "id": "6f2a1f1f-9966-4559-930d-b4369f5aeb7e",
+      "name": "Respond to Chat6"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.Message }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1840,
+        -1184
+      ],
+      "id": "3e6fe0f5-d446-4f68-9be2-22fc120e0085",
+      "name": "Respond to Chat7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const userInput = items[0].json.chatInput.toLowerCase();\nlet searchIntent = \"General\"; // 1. Always start as General\n\n// --- Keywords (same as before) ---\nconst hardwareKeywords = [\n    'hardware', 'hardwar', 'accessories', 'mouse', 'desktop', \n    'laptop', 'server', 'monitor', 'keyboard', 'headset', 'drive', \n    'router', 'webcam'\n];\n\nconst softwareKeywords = [\n    'software', 'softwar', 'softwere', 'programs', 'program', 'code', 'ide', \n    'analytics', 'editor', 'office', 'finance', 'design'\n];\n\n// 2. Check and set Hardware intent\nfor (const keyword of hardwareKeywords) {\n    if (userInput.includes(keyword)) {\n        searchIntent = \"Hardware\";\n        break; // Found Hardware, exit loop\n    }\n}\n\n// 3. If intent is *still* General (i.e., not Hardware), check for Software\nif (searchIntent === \"General\") { \n    for (const keyword of softwareKeywords) {\n        if (userInput.includes(keyword)) {\n            searchIntent = \"Software\";\n            break; // Found Software, exit loop\n        }\n    }\n}\n\n// 4. If neither Hardware nor Software was found, searchIntent remains \"General\"\nitems[0].json.searchIntent = searchIntent;\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2896,
+        -832
+      ],
+      "id": "6777f454-2fa6-4c86-9fcd-ddaf1bbb6407",
+      "name": "Search Preference"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.searchIntent }}",
+                    "rightValue": "Hardware",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6000aa9c-e2fe-4965-8907-ef45bfbd5897"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hardware"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cf4051fc-f419-4e8d-906e-f53b8a373280",
+                    "leftValue": "={{ $json.searchIntent }}",
+                    "rightValue": "Software",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Software"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1918638f-de4a-4f6e-9226-01d615c4d635",
+                    "leftValue": "={{ $json.searchIntent }}",
+                    "rightValue": "General",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "General"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2688,
+        -816
+      ],
+      "id": "e7b340d7-263f-4519-93a1-be7840f9972e",
+      "name": "Chat preference start"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2192,
+        -640
+      ],
+      "id": "9fe0510d-208c-46ef-a152-1602149e17e5",
+      "name": "Call 'Centralized Database Settings'2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe8cb560-8f75-438c-bac7-0687e4e44dd2",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $json.N8N_FRONTEND }}",
+              "type": "string"
+            },
+            {
+              "id": "670cf913-f4b2-40d9-a65c-821bd1245741",
+              "name": "Search",
+              "value": "={{ $('Respond to Chat  Software10').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1968,
+        -656
+      ],
+      "id": "6e46cefe-6895-428c-9fd3-955657f9cd34",
+      "name": "About Software Fields"
+    },
+    {
+      "parameters": {
+        "message": "=Here is the results of your query \n{{ $json.final_message }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        -656
+      ],
+      "id": "546a763b-23d0-4ee3-95ce-a6392c22662d",
+      "name": "Respond to Chat Software Option"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2208,
+        -832
+      ],
+      "id": "b348a8b3-ceb0-47bd-b39b-0923c3e2c736",
+      "name": "Call 'Centralized Database Settings'3"
+    },
+    {
+      "parameters": {
+        "message": "=Okay, Since you chose **{{ $('Search Preference').item.json.searchIntent }}**. \nWhat is your specific question about **{{ $('Search Preference').item.json.searchIntent }}**? ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -2432,
+        -624
+      ],
+      "id": "3710b9bc-a199-4216-bdb7-141a8c6c3a09",
+      "name": "Respond to Chat  Software10"
+    },
+    {
+      "parameters": {
+        "message": "=Okay, Since you chose **{{ $('Search Preference').item.json.searchIntent }}**. \nWhat is your specific question about **{{ $('Search Preference').item.json.searchIntent }}**? ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -2416,
+        -832
+      ],
+      "id": "dc9dfeab-53fb-4b5a-8ed8-f17923422ac6",
+      "name": "Respond to Chat hardware 9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/About-Hardware-Chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Search",
+              "value": "={{ $json.Search }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        -832
+      ],
+      "id": "2897246a-9ed6-4986-995e-5df914d7f477",
+      "name": "HTTP Request to Hardware Flow"
+    },
+    {
+      "parameters": {
+        "message": "=Here is the results of your query \n{{ $json.final_message2 }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        -832
+      ],
+      "id": "18768f4c-4a9f-4358-b994-7acfde0a9933",
+      "name": "Respond to Chat Hardware 11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe8cb560-8f75-438c-bac7-0687e4e44dd2",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $json.N8N_FRONTEND }}",
+              "type": "string"
+            },
+            {
+              "id": "670cf913-f4b2-40d9-a65c-821bd1245741",
+              "name": "Search",
+              "value": "={{ $('Respond to Chat hardware 9').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2000,
+        -832
+      ],
+      "id": "7fe195e0-9e32-41ea-a685-2463ec0eb1eb",
+      "name": "About Hardware Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/About-Software-Chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Search",
+              "value": "={{ $json.Search }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        -624
+      ],
+      "id": "d6334de7-d435-4f20-8c53-bdd20c0f3d7c",
+      "name": "HTTP Request To Software Hook"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2192,
+        -432
+      ],
+      "id": "62efa18c-6c62-4be9-99f1-9d42616bdabc",
+      "name": "Call 'Centralized Database Settings'4"
+    },
+    {
+      "parameters": {
+        "message": "=Okay, Since you chose **{{ $('Search Preference').item.json.searchIntent }}**. \nWhat is your specific question about **{{ $('Search Preference').item.json.searchIntent }}**? ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -2720,
+        -480
+      ],
+      "id": "b16d61db-29f6-45c3-b6c2-7dd54bb5ac8d",
+      "name": "Respond to Chat About General"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe8cb560-8f75-438c-bac7-0687e4e44dd2",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $json.N8N_FRONTEND }}",
+              "type": "string"
+            },
+            {
+              "id": "670cf913-f4b2-40d9-a65c-821bd1245741",
+              "name": "Search",
+              "value": "={{ $('Respond to Chat About General').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1984,
+        -432
+      ],
+      "id": "d989edfe-79f0-45be-93f6-6062da252df9",
+      "name": "About General Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/About-Us-Genral-Chat-Option",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Search",
+              "value": "={{ $json.Search }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1744,
+        -432
+      ],
+      "id": "b0dfcb2d-31a9-4828-95f1-f3fad909f343",
+      "name": "HTTP Request to General - About"
+    },
+    {
+      "parameters": {
+        "message": "=Here is the results of your query \n{{ $json.final_message3 }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        -432
+      ],
+      "id": "9bced670-0690-4acf-a955-61ec09a52aab",
+      "name": "Respond to Chat General About"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat2": {
+      "main": [
+        [
+          {
+            "node": "Department Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Department Validation": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'1": {
+      "main": [
+        [
+          {
+            "node": "Call Add Category Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Call 'Retrieve categories direct for preseneting'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Retrieve categories direct for preseneting'": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Add Category Chat": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat4": {
+      "main": [
+        [
+          {
+            "node": "Search Preference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Preference": {
+      "main": [
+        [
+          {
+            "node": "Chat preference start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat preference start": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat hardware 9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat  Software10",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Chat About General",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'2": {
+      "main": [
+        [
+          {
+            "node": "About Software Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "About Software Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request To Software Hook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'3": {
+      "main": [
+        [
+          {
+            "node": "About Hardware Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat  Software10": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat hardware 9": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Hardware Flow": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat Hardware 11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "About Hardware Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Hardware Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request To Software Hook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat Software Option",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Centralized Database Settings'4": {
+      "main": [
+        [
+          {
+            "node": "About General Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat About General": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "About General Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to General - About",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to General - About": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat General About",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0a12a737-9a01-4701-b804-0fe1d27b321c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "OeLRwsl6vpu3cMxe",
+  "tags": []
+}
