@@ -1,0 +1,255 @@
+{
+  "name": "Centralized Database Settings",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "Centralized Token Request",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -768,
+        96
+      ],
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        256
+      ],
+      "id": "e3c4b20d-f189-4b17-81bb-597522aa4388",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        64
+      ],
+      "id": "d40bc7f0-3aba-46fd-b6d5-15d21759fc45",
+      "name": "Datatable Central Settings",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmcZeAoJSPeCoNx",
+          "mode": "list",
+          "cachedResultName": "secrettable",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblmcZeAoJSPeCoNx"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $('Retrieve central settings').item.json.MyIP }}\"\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "4e76fd26-b738-4bcc-b2ac-fa8bfa7e1133",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "602f362f-66ae-4912-a061-40929271ab24",
+              "name": "LARAVEL_BACKEND",
+              "value": "={{ $json.LARAVEL_BACKEND }}",
+              "type": "string"
+            },
+            {
+              "id": "d68e045c-9e16-4a5b-9092-9afbd155e680",
+              "name": "LARAVEL_BACKEND_IP",
+              "value": "={{ $json.LARAVEL_BACKEND_API }}",
+              "type": "string"
+            },
+            {
+              "id": "7645f9bc-5dc5-462d-904e-def810c3c72d",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $json.N8N_FRONTEND }}",
+              "type": "string"
+            },
+            {
+              "id": "5f6136e2-52b6-482f-9f11-cc35ef35490a",
+              "name": "MyIP",
+              "value": "={{ $json.MyIP }}",
+              "type": "string"
+            },
+            {
+              "id": "dcefb5b0-562c-4d43-8563-c5981b79072e",
+              "name": "LARAVEL_BACKEND_MCP",
+              "value": "={{ $json.LARAVEL_BACKEND_MCP }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        224
+      ],
+      "id": "39d05c7c-932b-460d-8b41-5271c31cc60b",
+      "name": "settings"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0419401-4284-47fc-b52c-205ec03be0c9",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "bc167602-4c40-4ace-86ba-5f615bd6c44a",
+              "name": "LARAVEL_BACKEND_IP",
+              "value": "={{ $('settings').item.json.LARAVEL_BACKEND_IP }}",
+              "type": "string"
+            },
+            {
+              "id": "da890c79-57e9-4582-87d7-8a0c47797107",
+              "name": "LARAVEL_BACKEND",
+              "value": "={{ $('settings').item.json.LARAVEL_BACKEND }}",
+              "type": "string"
+            },
+            {
+              "id": "200d8df9-48f4-4c8c-9854-31ca0340881b",
+              "name": "N8N_FRONTEND",
+              "value": "={{ $('settings').item.json.N8N_FRONTEND }}",
+              "type": "string"
+            },
+            {
+              "id": "8e583383-ee20-4288-ab45-3c904be1c834",
+              "name": "LARAVEL_BACKEND_MCP",
+              "value": "={{ $('settings').item.json.LARAVEL_BACKEND_MCP }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        224
+      ],
+      "id": "8d8c4648-76c0-41ba-a701-03504efef934",
+      "name": "token and settings"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Centralized Token Request": {
+      "main": [
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatable Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Token By IP Address": {
+      "main": [
+        [
+          {
+            "node": "token and settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Token By IP Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6d53e808-43ff-4c4e-92bb-d4c91c472982",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "JZVjEJheLGlDnNz4",
+  "tags": []
+}

@@ -1,0 +1,1178 @@
+{
+  "name": "Add Category version 2 Complete - back Up November 20",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Add category",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "department",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Marketing"
+                  },
+                  {
+                    "option": "Sales"
+                  },
+                  {
+                    "option": "PR"
+                  },
+                  {
+                    "option": "HR"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Document",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "image/jpeg,image/png,image/gif,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/csv,application/json"
+            },
+            {
+              "fieldLabel": "Image",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "image/jpeg,image/png,image/gif"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -5584,
+        -688
+      ],
+      "id": "8843f061-37bc-4f75-af13-7861e54ea93a",
+      "name": "Adding category",
+      "webhookId": "121e2565-26ce-496a-939c-79b60591fad6",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -5120,
+        -640
+      ],
+      "id": "8bd86e58-89e6-4d9f-b0bb-5149f7a43e47",
+      "name": "Merge two files",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "merging two filesss"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "Image",
+        "destinationKey": "ImageRaw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -5424,
+        -1008
+      ],
+      "id": "b2d6061b-fef8-4203-8f4f-520cbc71d660",
+      "name": "Extract from Image",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "Document",
+        "destinationKey": "FileRaw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -5440,
+        -320
+      ],
+      "id": "f6a1b707-14fc-44b0-abed-98b1cf029932",
+      "name": "Extract from File",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput",
+      "notes": "file extract error"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "ImageRaw",
+        "binaryPropertyName": "ImageConverted",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -4928,
+        -1024
+      ],
+      "id": "60fb3df8-1193-40fa-9397-f15738130fa2",
+      "name": "Convert to Image",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "FileRaw",
+        "binaryPropertyName": "FileConverted",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -5264,
+        -176
+      ],
+      "id": "3f89b7c4-e3ed-4651-91b9-69de6d580c24",
+      "name": "Convert to File",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput",
+      "notes": "file convert error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9bc3f949-edcf-4321-8a69-90e2c2678875",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "6482c306-95c5-4dc8-93cb-e7b73e2ce553",
+              "name": "department",
+              "value": "={{ $json.department }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4928,
+        -384
+      ],
+      "id": "611c07df-0a91-46e9-850a-0b432855dd39",
+      "name": "The text Values",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -4768,
+        -768
+      ],
+      "id": "78d08b41-d35c-4371-b467-2a84fa48ae9d",
+      "name": "Text and Binary",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\n\n// Detect binary presence and force booleans\nconst imgNew  = !!item.binary?.ImageConverted;\nconst fileNew = !!item.binary?.FileConverted;\n\nconst imgOld  = !!item.binary?.ImageOriginal;\nconst fileOld = !!item.binary?.FileOriginal;\n\n// Build the output item\nconst out = {\n    json: {\n        imgNew,\n        fileNew,\n        imgOld,\n        fileOld\n    }\n};\n\n// Only copy existing binary if it exists\nif (item.binary) {\n    out.binary = item.binary;\n}\n\nreturn [out];\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4672,
+        -560
+      ],
+      "id": "59a03ccf-2533-4084-afb7-d13e47796714",
+      "name": "Checking the Image and Docuemnt Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"imgNew\"] === true && $json[\"fileNew\"] === true }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "9588c5a8-622f-46ff-ba98-1c419eb8ee41"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image and Docuemnt"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d6bc0e1f-7d63-4420-a554-fdad5b071afb",
+                    "leftValue": "={{ $json[\"imgNew\"] === true && $json[\"fileNew\"] === false }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "034f1d1f-a83c-4561-a7c9-74be7041ca82",
+                    "leftValue": "={{ $json[\"imgNew\"] === false && $json[\"fileNew\"] === true }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only File"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "77386751-04d3-4f62-af28-ec8118943a6a",
+                    "leftValue": "={{ $json[\"imgNew\"] === false && $json[\"fileNew\"] === false }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Only Text"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -4464,
+        -592
+      ],
+      "id": "b203edf9-bb20-4280-80eb-9f1edf8e0349",
+      "name": "Switch",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Ey7TZP0ijov0nAlS",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Ey7TZP0ijov0nAlS",
+          "cachedResultName": "Add category Full Image and File"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -4144,
+        -1104
+      ],
+      "id": "78846cbb-240a-4128-b065-ee4840d7491f",
+      "name": "Call Full Info Path",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f424d23e-661b-4b7c-a8aa-124b91b774c2",
+              "name": "name",
+              "value": "={{ $('Text and Binary').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "246dd127-7dc1-4f3f-8cc1-62a2cd480a7d",
+              "name": "department",
+              "value": "={{ $('Text and Binary').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "7c385ade-5989-4894-9d1d-b58abf065e89",
+              "name": "filenew",
+              "value": "={{ $binary.FileConverted ? 'FileConverted' : null }}",
+              "type": "binary"
+            },
+            {
+              "id": "44dc6a7c-2b63-458f-aa36-4a180a695670",
+              "name": "imgnew",
+              "value": "={{ $binary.ImageConverted ? 'ImageConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4416,
+        -960
+      ],
+      "id": "f8aadae7-d3c1-4803-bc07-26668f98c40a",
+      "name": "Set Full Paramters"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d6bee981-683d-433c-a5f4-ddea8522afb9",
+              "name": "name",
+              "value": "={{ $('Text and Binary').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "23a24e87-2c16-429c-b384-3cfdc3208053",
+              "name": "department",
+              "value": "={{ $('Text and Binary').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "ef0a8849-0d50-4d20-ad04-6d118e569fc4",
+              "name": "imgnew",
+              "value": "={{ $binary.ImageConverted ? 'ImageConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4224,
+        -816
+      ],
+      "id": "916995ea-0dcc-4b29-936a-8d81d5c1e072",
+      "name": "Set Image Paramters"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "469ddcd3-63ef-40ae-94ed-4e52c418a572",
+              "name": "name",
+              "value": "={{ $('Text and Binary').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "40695432-d60b-4533-bb7a-53c9b8fe82ad",
+              "name": "department",
+              "value": "={{ $('Text and Binary').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "3394cec3-e8d1-4d83-b694-e7c925325e12",
+              "name": "filenew",
+              "value": "={{ $binary.FileConverted ? 'FileConverted' : null }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4176,
+        -624
+      ],
+      "id": "1d57833d-90e0-4680-baaf-85635d318f40",
+      "name": "Set File Paramters"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b2ac704e-ae54-47d2-ad77-5b55fc067d12",
+              "name": "name",
+              "value": "={{ $('Text and Binary').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "d3419b32-c3ba-4b80-9c9c-83ff314ccac7",
+              "name": "department",
+              "value": "={{ $('Text and Binary').item.json.department }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4192,
+        -416
+      ],
+      "id": "2f7fd22e-0508-4d18-8884-96843a8c7446",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aqw1yqfvgJqA1DY1",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/aqw1yqfvgJqA1DY1",
+          "cachedResultName": "Add Category With File"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3920,
+        -672
+      ],
+      "id": "96412729-b495-4bc9-9acb-446acd2d4061",
+      "name": "Call File Flow",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "9NihaxMfLZvlDlDW",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9NihaxMfLZvlDlDW",
+          "cachedResultName": "Add Category Image"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3920,
+        -896
+      ],
+      "id": "2baa0231-a720-471e-aa75-27af5666ac28",
+      "name": "Call image SubFlow",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c4igN21MFmm9h348",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c4igN21MFmm9h348",
+          "cachedResultName": "Centralized Database Settings Limited"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3936,
+        -1184
+      ],
+      "id": "c1b22c3f-5d00-4198-9107-1accdb9004e5",
+      "name": "Settings Limited",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/insert-read-first-cat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Call Full Info Path').item.json.data.cat.id }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $('Call Full Info Path').item.json.data.cat.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Call Full Info Path').item.json.data.cat.department }}"
+            },
+            {
+              "name": "img",
+              "value": "={{ $json.LARAVEL_BACKEND }}/{{ $('Call Full Info Path').item.json.data.image.large }}"
+            },
+            {
+              "name": "filer",
+              "value": "={{ $json.LARAVEL_BACKEND }}/{{ $('Call Full Info Path').item.json.data.file.path }}"
+            },
+            {
+              "name": "created_at",
+              "value": "={{ $('Call Full Info Path').item.json.data.cat.created_at.replace('.000000Z', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3680,
+        -1200
+      ],
+      "id": "fd7e516d-630d-4c22-8598-b0177d04830f",
+      "name": "Full Add to Google Sheet and Email"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c4igN21MFmm9h348",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c4igN21MFmm9h348",
+          "cachedResultName": "Centralized Database Settings Limited"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3664,
+        -992
+      ],
+      "id": "db02535c-b82d-487c-8fe9-607d49d0ddb5",
+      "name": "Settings Limited1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/insert-read-first-cat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Call image SubFlow').item.json.data.cat.id }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $('Call image SubFlow').item.json.data.cat.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Call image SubFlow').item.json.data.cat.department }}"
+            },
+            {
+              "name": "img",
+              "value": "={{ $json.LARAVEL_BACKEND }}/{{ $('Call image SubFlow').item.json.data.image.large }}"
+            },
+            {
+              "name": "created_at",
+              "value": "={{ $('Call image SubFlow').item.json.data.cat.created_at.replace('.000000Z', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3456,
+        -992
+      ],
+      "id": "8d16cf47-b7f3-4f6e-adc0-12963441a264",
+      "name": "Image Add top Google Sheet and Email"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c4igN21MFmm9h348",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c4igN21MFmm9h348",
+          "cachedResultName": "Centralized Database Settings Limited"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3712,
+        -768
+      ],
+      "id": "7705643f-e563-4afa-8f45-c9490d3218d0",
+      "name": "Settings Limited-2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c4igN21MFmm9h348",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c4igN21MFmm9h348",
+          "cachedResultName": "Centralized Database Settings Limited"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3776,
+        -512
+      ],
+      "id": "d890e18d-e68f-429b-95b7-d614ab651b86",
+      "name": "Settings Limited 3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "G2ljbgsQAtBecvXG",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/G2ljbgsQAtBecvXG",
+          "cachedResultName": "Add Category text Only Flow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3984,
+        -416
+      ],
+      "id": "e96688e0-81b1-426d-a823-9a67f14b77dc",
+      "name": "Only Text Flow",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/insert-read-first-cat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Call File Flow').item.json.data.cat.id }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $('Call File Flow').item.json.data.cat.name }}"
+            },
+            {
+              "name": "filer",
+              "value": "={{ $json.LARAVEL_BACKEND }}/{{ $('Call File Flow').item.json.data.file.path }}"
+            },
+            {
+              "name": "created_at",
+              "value": "={{ $('Call File Flow').item.json.data.cat.created_at.replace('.000000Z', '') }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Call File Flow').item.json.data.cat.department }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3504,
+        -768
+      ],
+      "id": "2f7fd6f2-c1bd-4c74-aa80-a51de25a0e4f",
+      "name": "File Add goole Sheets Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/insert-read-first-cat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Only Text Flow').item.json.data.cat.id }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $('Only Text Flow').item.json.data.cat.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Only Text Flow').item.json.data.cat.department }}"
+            },
+            {
+              "name": "created_at",
+              "value": "={{ $('Only Text Flow').item.json.data.cat.created_at.replace('.000000Z', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3568,
+        -512
+      ],
+      "id": "b8c54af1-da00-407e-a927-4c2807581abd",
+      "name": "Only Text Add to Google Sheets and Message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Adding category": {
+      "main": [
+        [
+          {
+            "node": "Extract from Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "The text Values",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Merge two files": {
+      "main": [
+        [
+          {
+            "node": "Text and Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from Image": {
+      "main": [
+        [
+          {
+            "node": "Convert to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Image": {
+      "main": [
+        [
+          {
+            "node": "Merge two files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Merge two files",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "The text Values": {
+      "main": [
+        [
+          {
+            "node": "Text and Binary",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        []
+      ]
+    },
+    "Text and Binary": {
+      "main": [
+        [
+          {
+            "node": "Checking the Image and Docuemnt Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Checking the Image and Docuemnt Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Set Full Paramters",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Image Paramters",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set File Paramters",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Full Paramters": {
+      "main": [
+        [
+          {
+            "node": "Call Full Info Path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Image Paramters": {
+      "main": [
+        [
+          {
+            "node": "Call image SubFlow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File Paramters": {
+      "main": [
+        [
+          {
+            "node": "Call File Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Only Text Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Full Info Path": {
+      "main": [
+        [
+          {
+            "node": "Settings Limited",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call File Flow": {
+      "main": [
+        [
+          {
+            "node": "Settings Limited-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call image SubFlow": {
+      "main": [
+        [
+          {
+            "node": "Settings Limited1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings Limited": {
+      "main": [
+        [
+          {
+            "node": "Full Add to Google Sheet and Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings Limited1": {
+      "main": [
+        [
+          {
+            "node": "Image Add top Google Sheet and Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings Limited-2": {
+      "main": [
+        [
+          {
+            "node": "File Add goole Sheets Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Text Flow": {
+      "main": [
+        [
+          {
+            "node": "Settings Limited 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings Limited 3": {
+      "main": [
+        [
+          {
+            "node": "Only Text Add to Google Sheets and Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "112628a2-91a0-4171-aa32-a3deb5d64672",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "UQGsZxztilacRKU7",
+  "tags": []
+}

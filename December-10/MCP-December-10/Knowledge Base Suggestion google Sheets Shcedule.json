@@ -1,0 +1,75 @@
+{
+  "name": "Knowledge Base Suggestion google Sheets Shcedule",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ebbab963-7c94-4797-b066-663760f0fe83",
+      "name": "Knowledge Base Suggestion google Sheets Shcedule",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Q7nsgfXPbip9NXyn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Q7nsgfXPbip9NXyn",
+          "cachedResultName": "Read Knowledge Base OnDailyBasis"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "2ac836b2-90f2-4119-9fad-a2a6c731698a",
+      "name": "Call 'Read Knowledge Base OnDailyBasis'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Knowledge Base Suggestion google Sheets Shcedule": {
+      "main": [
+        [
+          {
+            "node": "Call 'Read Knowledge Base OnDailyBasis'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7b1e5a32-aeb1-4f8b-b5f8-731c74771e7b",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "OEqA8WDkuDhgqYwD",
+  "tags": []
+}

@@ -1,0 +1,335 @@
+{
+  "name": "Upsert Suggestion google Sheet Notify Laravel",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 */1 * * * *"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY",
+          "mode": "list",
+          "cachedResultName": "Knowledge Base Suggestions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Insert",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY/edit#gid=0"
+        },
+        "event": "rowUpdate",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        -240
+      ],
+      "id": "ff9dcc00-7ef8-401b-8d14-abb0a01e4d63",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "8iaKypw7V0mjBoMg",
+          "name": "Google Sheets Trigger account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4c1aec9e-0023-4d4f-aeb8-60ba486fd664",
+              "leftValue": "={{ $json.SuggestionID }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1129d96e-0f80-460e-9f98-0b83de43c719",
+              "leftValue": "={{ $json.Suggestion }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "094863d1-861f-42fe-b4d0-bf2ff39be6b2",
+              "leftValue": "={{ $json.Details }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "366fa096-738a-4821-91d3-3335a644635b",
+              "leftValue": "={{ $json.knowledgebaseid || $json.KnowledgeBase }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -640,
+        -320
+      ],
+      "id": "d52c7d00-11d3-4796-ad91-9c9d6b23635f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Logged In Guard Middleware Extended').item.json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" +  $('Logged In Guard Middleware Extended').item.json.token}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"manage-baser-suggestions\",\n    \"arguments\": {\n      \"action\": \"upsert\",\n \"baser_id\": \"{{ $json.knowledgebaseid || null }}\",\n      \"SuggestionID\": \"{{ $json.SuggestionID }}\",\n      \"KnowledgeBase\": \"{{ $json.KnowledgeBase }}\",\n      \"Suggestion\": \"{{ $json.Suggestion }}\",\n      \"Details\": \"{{ $json.Details }}\"\n    }\n  },\n  \"id\": {{ Math.floor(Math.random() * 2000) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -48,
+        -240
+      ],
+      "id": "75d1c373-6990-4297-b531-217c89156330",
+      "name": "HTTP Request to categories FilterPrompt prperation",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wRyw7DyTlioKKc5i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wRyw7DyTlioKKc5i",
+          "cachedResultName": "Logged In Guard Middleware Extended"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        -304
+      ],
+      "id": "90616b46-a43f-4b9b-8df5-c73783c3a0e2",
+      "name": "Logged In Guard Middleware Extended"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da045847-cea3-49ed-89fc-a89276284c47",
+              "name": "SuggestionID",
+              "value": "={{ $('If').item.json.SuggestionID }}",
+              "type": "string"
+            },
+            {
+              "id": "f9890814-207b-48be-a424-a57400bc20f7",
+              "name": "knowledgebaseid",
+              "value": "={{ $('If').item.json.knowledgebaseid }}",
+              "type": "string"
+            },
+            {
+              "id": "b04df16c-a572-4048-b4b2-21c0613ffc07",
+              "name": "KnowledgeBase",
+              "value": "={{ $('If').item.json.KnowledgeBase }}",
+              "type": "string"
+            },
+            {
+              "id": "890b8565-009a-492d-a394-d3f08f693f9e",
+              "name": "Suggestion",
+              "value": "={{ $('If').item.json.Suggestion }}",
+              "type": "string"
+            },
+            {
+              "id": "9f9f35d0-352f-4c3c-9848-f963dd82fad9",
+              "name": "Details",
+              "value": "={{ $('If').item.json.Details }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -320
+      ],
+      "id": "4f4d4528-4258-4c95-ad2b-720950f60d9f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- CLEAN ALL FIELDS CODE NODE ---\n// Loop over incoming items (1 per row).\nconst outputItems = items.map(item => {\n  const json = item.json;\n  \n  // Trim all string fields (handles tabs, spaces, nulls).\n  const trimmed = {\n    SuggestionID: json.SuggestionID,\n    knowledgebaseid: json.knowledgebaseid,\n    KnowledgeBase: typeof json.KnowledgeBase === 'string' ? json.KnowledgeBase.trim() : json.KnowledgeBase,\n    Suggestion: typeof json.Suggestion === 'string' ? json.Suggestion.trim() : json.Suggestion,\n    Details: typeof json.Details === 'string' ? json.Details.trim() : json.Details\n  };\n  \n  // Carry auth from upstream.\n  const auth = $input.first().json;\n  \n  return {\n    json: {\n      ...trimmed,  // Cleaned sheet fields.\n      token: auth.token,\n      LARAVEL_BACKEND_MCP: auth.LARAVEL_BACKEND_MCP\n    }\n  };\n});\n\nreturn outputItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        -160
+      ],
+      "id": "e2e412d9-a173-471f-b94c-7a6850c63b66",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "UeCuol9MOfxhrDnU",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/UeCuol9MOfxhrDnU",
+          "cachedResultName": "InsertSheet-Read Update Knowledge Base Suggestion OnDailyBasis"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        -368
+      ],
+      "id": "01810da6-0aa1-4720-bea6-2f858dbff2fa",
+      "name": "Call 'InsertSheet-Read Update Knowledge Base Suggestion OnDailyBasis'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Logged In Guard Middleware Extended",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Logged In Guard Middleware Extended": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to categories FilterPrompt prperation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to categories FilterPrompt prperation": {
+      "main": [
+        [
+          {
+            "node": "Call 'InsertSheet-Read Update Knowledge Base Suggestion OnDailyBasis'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ed4fafda-42aa-42ac-809a-c7d1ac4afd5e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "m7YowMO96OyCLcYA",
+  "tags": []
+}

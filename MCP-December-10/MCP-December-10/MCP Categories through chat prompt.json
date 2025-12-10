@@ -1,0 +1,608 @@
+{
+  "name": "MCP Categories through chat prompt",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1552,
+        -320
+      ],
+      "id": "b17134e3-f2bb-4bd7-b83f-57049163e995",
+      "name": "When chat message received",
+      "webhookId": "2ac54ee8-2a5e-47d8-91df-4d74d7d44a44",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wRyw7DyTlioKKc5i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wRyw7DyTlioKKc5i",
+          "cachedResultName": "Logged In Guard Middleware Extended"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1312,
+        -128
+      ],
+      "id": "3797b354-60ee-44ce-8f2c-9eefbc164909",
+      "name": "Call 'Logged In Guard Middleware Extended'"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "# N8N AI Agent System Prompt\n\nYou are an AI assistant connected to the **Knowledge MCP Server** for managing categories across different departments.\n\n---\n\n## Your Primary Task\n\nWhen users ask about categories, you must:\n\n1. **Interpret their request** using the `filter-categories` MCP prompt\n2. **Retrieve the categories** using the `knowledge://categories-filter` MCP resource\n3. **Present results conversationally** to the user\n\n---\n\n## Available Departments\n\nThe system has **4 departments** plus a blank option:\n- **Sales** (variations: sales, sale, sayles, items sold, sales team)\n- **Marketing** (variations: marketing, market, marketting, promotions)  \n- **HR** (variations: hr, human resources, manpower, personnel)\n- **PR** (variations: pr, public relations, external relations, customer relations)\n- **Blank** (categories with no department assigned)\n- **All** (every category from all departments)\n\n---\n\n## Step-by-Step Workflow\n\n### Step 1: Call the Prompt to Interpret User Input\n\nWhen the user mentions categories, **immediately call** the `filter-categories` prompt with their input.\n\n**How to call it:**\n```\nWhen the user mentions categories, return ONLY a JSON block, wrapped inside triple backticks with the language tag json:\n\n```json\n{\n  \"command\": \"<normalized command>\",\n  \"explanation\": \"<short explanation>\",\n  \"departments_included\": [\"<list of departments>\"],\n  \"user_input\": \"<original user message>\"\n}\n\n```\n\n**What you'll get back:**\n```json\n{\n  \"command\": \"hr sales\",\n  \"explanation\": \"Showing categories from: hr, sales\",\n  \"departments_included\": [\"hr\", \"sales\"],\n  \"user_input\": \"show me HR and Sales\"\n}\n```\n\n### Step 2: Call the Resource to Get Categories\n\nTake the `command` from Step 1 and pass it to the resource.\n\n**How to call it:**\n```\nUse MCP Resource: knowledge://categories-filter\nParameters: { \"command\": \"hr sales\" }\n```\n\n**What you'll get back:**\n```json\n{\n  \"command\": \"hr sales\",\n  \"resolved_departments\": [\"hr\", \"sales\"],\n  \"total_categories\": 23,\n  \"categories\": [\n    { \"id\": 1, \"name\": \"Employee Handbook\", \"department\": \"hr\", ... },\n    { \"id\": 5, \"name\": \"Sales Pipeline\", \"department\": \"sales\", ... }\n  ]\n}\n```\n\n### Step 3: Format and Present to User\n\nCreate a friendly, conversational response. **Do NOT show JSON or technical details.**\n\n---\n\n## Response Examples\n\n### ✅ Good Responses\n\n**User:** \"Show me all categories\"\n**You:** \"I found **47 categories** across all departments. Here are some highlights:\n- Employee Handbook (HR)\n- Marketing Strategy 2025 (Marketing)  \n- Sales Training Materials (Sales)\n- Press Release Templates (PR)\n\nWould you like to see a specific department?\"\n\n---\n\n**User:** \"HR and Sales please\"\n**You:** \"I found **23 categories** in HR and Sales:\n\n**HR:**\n- Employee Handbook\n- Onboarding Checklist\n- Benefits Guide\n\n**Sales:**\n- Sales Pipeline Guide\n- Product Catalog\n- Customer Scripts\n\nWould you like more details on any of these?\"\n\n---\n\n**User:** \"What about travel categories?\"\n**You:** \"I couldn't find a 'Travel' department in the system. The available departments are:\n- **Sales**\n- **Marketing**\n- **HR**\n- **PR**\n- **Blank** (no department)\n- **All** (everything)\n\nWhich would you like to explore?\"\n\n---\n\n### ❌ Bad Responses (Never do this)\n\n❌ \"I will call knowledge://categories-filter with command=hr\"\n❌ \"The MCP returned: {command: 'hr', categories: [...]}\"\n❌ \"Processing your request through filter-categories prompt...\"\n\n---\n\n## Command Format Reference\n\nThe `command` you pass to the resource should be one of these formats:\n\n| Command | Meaning |\n|---------|---------|\n| `sales` | Sales only |\n| `marketing` | Marketing only |\n| `hr` | HR only |\n| `pr` | PR only |\n| `blank` | No department |\n| `all` | All departments |\n| `hr sales pr` | Multiple departments (OR logic) |\n| `all but marketing` | All except marketing |\n| `all but blank` | All departments (exclude blank) |\n\n---\n\n## Natural Language Mapping\n\n| User Says | Command Output | What to Retrieve |\n|-----------|----------------|------------------|\n| \"show me everything\" | `all` | All categories |\n| \"HR stuff\" | `hr` | HR only |\n| \"Sales and Marketing\" | `sales marketing` | Sales OR Marketing |\n| \"categories without department\" | `blank` | Blank only |\n| \"everything except HR\" | `all but hr` | Sales, Marketing, PR |\n| \"all but blank\" | `all` | All 4 departments |\n\n---\n\n## Error Handling\n\n**If the user mentions an invalid department:**\n1. The prompt will return: `{ \"command\": \"\", ... }`\n2. The resource will return: `{ \"categories\": [], \"message\": \"No valid departments found\" }`\n3. **You respond:** List the 6 valid options (Sales, Marketing, HR, PR, Blank, All)\n\n**If no categories are found:**\n1. Check if it's an invalid department (see above)\n2. If valid but empty: \"There are currently no categories in [department]. Would you like to create one?\"\n\n---\n\n## Important Rules\n\n1. ✅ **Always call the prompt first** - Never try to parse the user's request yourself\n2. ✅ **Always call the resource second** - Use the command from the prompt\n3. ✅ **Be conversational** - Hide all MCP/technical details from the user\n4. ✅ **Show counts** - Tell the user how many categories were found\n5. ✅ **Organize by department** - When showing multiple departments, group them clearly\n6. ✅ **Handle typos automatically** - The prompt already handles synonyms and variations\n7. ❌ **Never show raw JSON** - Format everything in natural language\n8. ❌ **Never expose MCP calls** - Don't say \"I'm calling the MCP server...\"\n\n---\n\n## Quick Checklist\n\nBefore responding to a category request:\n- [ ] Did I call `filter-categories` prompt first?\n- [ ] Did I use the returned `command` to call the resource?\n- [ ] Did I format the results conversationally?\n- [ ] Did I hide all technical/JSON details?\n- [ ] Did I tell the user how many categories were found?\n\n---\n\n## Default Behavior\n\nIf the user's message is **unclear or doesn't mention departments**, treat it as `all` (show everything).\n\n**Example:**\n- User: \"show me categories\" → Call prompt with \"show me categories\" → Will return `command: \"all\"`\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -992,
+        -384
+      ],
+      "id": "a51841d5-06b5-4ac2-8f5d-1ea543ee2e8d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        80
+      ],
+      "id": "7d817d4d-d363-4c4a-98c5-87498ee6c9a3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KJf8tt07cth4UefJ",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        16
+      ],
+      "id": "80551be6-c3ee-45c1-b022-55e3c30a509b",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "CxYvMkMbr40cBdGm",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        128
+      ],
+      "id": "8c0caa11-4dc0-42f0-b28a-6bdf73fe4dab",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad711f99-9c6c-400a-b848-a84cb710eb7b",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1136,
+        -144
+      ],
+      "id": "861e3f7e-dde3-4bc2-8549-9311b7b05442",
+      "name": "chat input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ebdae6cf-43ae-4859-8ece-061d4d01fece",
+              "name": "LARAVEL_BACKEND_MCP",
+              "value": "={{ $('Call \\'Logged In Guard Middleware Extended\\'').item.json.LARAVEL_BACKEND_MCP }}",
+              "type": "string"
+            },
+            {
+              "id": "3f24a97a-39e1-49ef-9b07-d4e25ad7e2ed",
+              "name": "token",
+              "value": "={{ $('Call \\'Logged In Guard Middleware Extended\\'').item.json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "626f2ea7-a552-4e98-bb3d-5b55c7aca557",
+              "name": "LARAVEL_BACKEND",
+              "value": "={{ $('Call \\'Logged In Guard Middleware Extended\\'').item.json.LARAVEL_BACKEND }}",
+              "type": "string"
+            },
+            {
+              "id": "45d276ce-9f7d-40d5-a847-ff40e0716da3",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        -336
+      ],
+      "id": "9bc37701-1460-4587-b5bd-fe4166bcbe64",
+      "name": "Main Keys"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Main Keys').item.json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $('Main Keys').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2001,\n  \"method\": \"prompts/get\",\n  \"params\": {\n    \"name\": \"filter-categories\",\n    \"arguments\": {\n      \"command\": \"{{ $json.command }}\"\n    }\n  }\n}\n\n\n\n\n\n\n\n\n\n\n\n\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -416,
+        -80
+      ],
+      "id": "717dc966-eada-41d6-8025-6f79ea0a33f8",
+      "name": "HTTP Request to categories FilterPrompt prperation"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Main Keys').item.json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $('Main Keys').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2002,\n  \"method\": \"resources/read\",\n  \"params\": {\n    \"uri\": \"knowledge://categories-filter\",\n    \"parameters\": {\n      \"command\": \"{{ $json.command }}\"\n    }\n  }\n}\n\n\n\n\n\n\n\n\n\n\n\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -272,
+        -672
+      ],
+      "id": "f11b228f-26f6-4c22-92db-523d290c7d8e",
+      "name": "HTTP Request to categories Final Prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "const resourceResult = $json.result;\nconst contentText = resourceResult.contents[0].text;\n\n// Parse the JSON string\nlet categoriesData;\ntry {\n  categoriesData = JSON.parse(contentText);\n} catch (e) {\n  categoriesData = { categories: [], total_categories: 0 };\n}\n\nconst categories = categoriesData.categories || [];\nconst total = categoriesData.total_categories || 0;\n\n// Format response\nlet response = `I found ${total} categories`;\n\nif (categories.length > 0) {\n  response += \":\\n\\n\";\n  \n  // Group by department\n  const grouped = {};\n  categories.forEach(cat => {\n    const dept = cat.department || 'No Department';\n    if (!grouped[dept]) grouped[dept] = [];\n    grouped[dept].push(cat);\n  });\n  \n  // Display by department\n  Object.keys(grouped).forEach(dept => {\n    response += `**${dept}:**\\n`;\n    grouped[dept].slice(0, 5).forEach(cat => {\n      response += `  - ${cat.name}\\n`;\n    });\n    if (grouped[dept].length > 5) {\n      response += `  ...and ${grouped[dept].length - 5} more\\n`;\n    }\n    response += \"\\n\";\n  });\n} else {\n  response += \".\\n\\nNo categories match your criteria. Available departments: Sales, Marketing, HR, PR, Blank, All\";\n}\n\nreturn {\n  response,\n  totalCategories: total,\n  categories: categories\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -592
+      ],
+      "id": "7750977c-a226-4e5c-891e-7bd1a4966671",
+      "name": "Retrieved categories"
+    },
+    {
+      "parameters": {
+        "jsCode": "const promptResult = $json.result;\nconst messageText = promptResult.messages[0].content.text;\n\n// Parse the JSON string\nlet parsedCommand;\ntry {\n  parsedCommand = JSON.parse(messageText);\n} catch (e) {\n  parsedCommand = { command: 'all' }; // Default to 'all' if parsing fails\n}\n\nreturn {\n  command: parsedCommand.command || 'all',\n  resolved: parsedCommand.resolved || '',\n  departments: parsedCommand.departments || []\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -448
+      ],
+      "id": "790e8dab-1f4a-4f1e-8fdb-7c033c1c7617",
+      "name": "Pass on the commands"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json.text || $json.output || '';\n\n// Match the first JSON block inside triple backticks\nconst match = raw.match(/```json\\s*({[\\s\\S]*?})\\s*```/);\n\nlet parsed = {};\nif (match && match[1]) {\n  try {\n    parsed = JSON.parse(match[1]);\n  } catch (e) {\n    parsed = {};\n  }\n}\n\nreturn {\n  command: parsed.command || '',\n  resolved: parsed.explanation || '',\n  departments: parsed.departments_included || []\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        -128
+      ],
+      "id": "ab6fe4d9-db66-4c2d-967b-81cbea907de5",
+      "name": "Clean Chat"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Helper: prefix relative paths with backend base\nfunction withBase(base, path) {\n  if (!path) return '';\n  // If already absolute (http/https), return as-is\n  if (/^https?:\\/\\//i.test(path)) return path;\n  // If path starts with '/', prepend base directly\n  if (path.startsWith('/')) {\n    return base.replace(/\\/+$/, '') + path;\n  }\n  // Otherwise, ensure single slash between base and path\n  return base.replace(/\\/+$/, '') + '/' + path.replace(/^\\/+/, '');\n}\n\nconst base = $json.LARAVEL_BACKEND || 'http://localhost:8000';\n\n// Directly read categories array from resource output\nconst categories = items[0].json.categories || [];\n\nreturn categories.map(cat => {\n  const img   = cat.img   ? withBase(base, cat.img)   : '';\n  const img2  = cat.img2  ? withBase(base, cat.img2)  : '';\n  const filer = cat.filer ? withBase(base, cat.filer) : '';\n\n  let createdAt = cat.created_at || '';\n  if (createdAt) {\n    createdAt = createdAt.replace(/\\.\\d+Z$/, '');\n  }\n\n  return {\n    json: {\n      id: cat.id,\n      name: cat.name,\n      img,\n      img2,\n      filer,\n      department: cat.department || '',\n      created_at: createdAt,\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -400
+      ],
+      "id": "01143b4f-77fb-4c89-a9a8-59ca58dcc932",
+      "name": "Normalizing the Category Results"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "4E41t5URMsPzgI6a",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/4E41t5URMsPzgI6a",
+          "cachedResultName": "MCP-Resouce-All-Google-Sheets-Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        -656
+      ],
+      "id": "07d8e612-cbcc-40f5-a06c-9dbc56e0d1b4",
+      "name": "MCP Resource ALL Google Sheet Google Drive"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "MdWkzveNqZ2cNpzS",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/MdWkzveNqZ2cNpzS",
+          "cachedResultName": "Distribute categories to departments"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        -432
+      ],
+      "id": "834a20f3-a878-4a91-a309-13119bc95d7c",
+      "name": "Distribute to Departments"
+    },
+    {
+      "parameters": {
+        "message": "=Thank you, your query results: \n{{ $json.text }}\n----\n",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -432
+      ],
+      "id": "01b63492-1e37-4071-8de0-18fb806a6c76",
+      "name": "Respond to Chat",
+      "notesInFlow": true,
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const categories = items;\nconst grouped = {};\n\nfor (const item of categories) {\n  const dept = item.json.department || 'Unknown';\n  if (!grouped[dept]) grouped[dept] = [];\n  grouped[dept].push(item.json.name);\n}\n\nlet message = `📦 I found ${categories.length} categories:\\n\\n`;\n\nfor (const [dept, names] of Object.entries(grouped)) {\n  message += `**${dept}:**\\n`;\n  for (const name of names) {\n    message += ` - ${name}\\n`;\n  }\n  message += `\\n`;\n}\n\nreturn [{ json: { text: message } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -176
+      ],
+      "id": "bd4a1c84-d347-4086-a048-05912cbafe76",
+      "name": "Send Categories response to Chat"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9fd50563-5cd4-4e45-aac7-7a0b43d36a70",
+              "name": "chatrespnse",
+              "value": "={{ $('Retrieved categories').item.json.response }}\n-----\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -16
+      ],
+      "id": "e421332b-9891-441b-9238-85f654615d6c",
+      "name": "Hold Normalized Categories"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Call 'Logged In Guard Middleware Extended'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Logged In Guard Middleware Extended'": {
+      "main": [
+        [
+          {
+            "node": "chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Main Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chat input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Keys": {
+      "main": [
+        [
+          {
+            "node": "Clean Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to categories FilterPrompt prperation": {
+      "main": [
+        [
+          {
+            "node": "Pass on the commands",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to categories Final Prompt": {
+      "main": [
+        [
+          {
+            "node": "Retrieved categories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass on the commands": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to categories Final Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Chat": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to categories FilterPrompt prperation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizing the Category Results": {
+      "main": [
+        [
+          {
+            "node": "MCP Resource ALL Google Sheet Google Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Distribute to Departments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Categories response to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieved categories": {
+      "main": [
+        [
+          {
+            "node": "Normalizing the Category Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Resource ALL Google Sheet Google Drive": {
+      "main": [
+        []
+      ]
+    },
+    "Distribute to Departments": {
+      "main": [
+        []
+      ]
+    },
+    "Send Categories response to Chat": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hold Normalized Categories": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "32e2752d-bf7b-41b6-a182-470a738dfdd2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "6XUZwUdCx2cFJbaN",
+  "tags": []
+}

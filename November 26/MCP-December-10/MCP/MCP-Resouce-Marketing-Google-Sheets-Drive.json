@@ -1,0 +1,720 @@
+{
+  "name": "MCP-Resouce-Marketing-Google-Sheets-Drive",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "img"
+            },
+            {
+              "name": "filer"
+            },
+            {
+              "name": "department"
+            },
+            {
+              "name": "created_at"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -336,
+        16
+      ],
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1tB6w4fAPj0S51xcKOOCQ-ZFjyiMJfNQuwAfj26oV9iI",
+          "mode": "list",
+          "cachedResultName": "N8N Categories Through MCP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tB6w4fAPj0S51xcKOOCQ-ZFjyiMJfNQuwAfj26oV9iI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 217360960,
+          "mode": "list",
+          "cachedResultName": "Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tB6w4fAPj0S51xcKOOCQ-ZFjyiMJfNQuwAfj26oV9iI/edit#gid=217360960"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id }}",
+            "Name": "={{ $json.name }}",
+            "Department": "={{ $json.department }}",
+            "Image": "={{ $json.img }}",
+            "File": "={{ $json.filer }}",
+            "Date Created": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        -416
+      ],
+      "id": "3c74d6a5-548c-466b-8160-c8b56b36bddc",
+      "name": "Marketing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.File }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "14UpMIJbAXsRecj0THKxM2H3D3wXLa9qc",
+            "mode": "list",
+            "cachedResultName": "Marketing",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/14UpMIJbAXsRecj0THKxM2H3D3wXLa9qc"
+          }
+        },
+        "options": {
+          "fields": [
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        -304
+      ],
+      "id": "c441fa01-eb50-41c8-ae73-fb262e551e64",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zlniUrJBkZu2JdPG",
+          "name": "Google Drive N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fileName = item.json.File;\n  if (!fileName || fileName.trim() === \"\") {\n    return { json: { File: null, fileExists: false } };\n  }\n  return { json: { File: fileName, fileExists: true } };\n});\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -400
+      ],
+      "id": "3eaa0ec0-7aeb-49c6-a6d6-ff8fa84d1f99",
+      "name": "Check File exists Then Retrieve Name",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d5e53086-733c-44ae-ba5c-96e7265356a9",
+              "leftValue": "={{ $json.File }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        208
+      ],
+      "id": "9bac6e29-133e-4327-ae8d-1b4f7ca5f9a9",
+      "name": "If File NOT Empty",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $json.batchSize }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "187a8699-1770-4a52-9265-00a17f66db1f",
+      "name": "Loop Over Items",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const itemCount = items.length;\nreturn [{ json: { batchSize: itemCount } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        48
+      ],
+      "id": "676f7b7d-404f-4470-a8ec-8bf680be93b8",
+      "name": "Count of Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fullUrl = item.json.File;\n  const fileName = fullUrl ? fullUrl.split('/').pop() : null;\n  return { json: { File: fileName } };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -112
+      ],
+      "id": "89a03eb9-f132-4e10-8f6b-0255a15469cf",
+      "name": "Get Relative File Name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf8568d6-be51-41d6-918f-5c33fece7bf8",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        -336
+      ],
+      "id": "6e6c7a95-2ad1-4984-85d2-d6cd3776261a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect expected full URLs from DB/list\nconst expected = items\n  .map(i => (i.json.File || '').trim())\n  .filter(v => v.length > 0);\n\n// Collect found names from Drive search\nconst foundNames = items\n  .map(i => (i.json.name || '').trim())\n  .filter(v => v.length > 0);\n\n// Build a set of found names for fast lookup\nconst foundSet = new Set(foundNames);\n\n// Filter expected URLs: keep only those whose basename is not in Drive\nconst missing = expected.filter(url => {\n  const baseName = url.split('/').pop();\n  return !foundSet.has(baseName);\n});\n\n// Return missing files with full URL for downstream upload\nreturn missing.map(url => ({\n  json: {\n    File: url,\n    Original: url\n  }\n}));\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -96
+      ],
+      "id": "481e6e72-7a60-44c8-a703-f18c9e9a85cd",
+      "name": "Only New Files"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86248e5c-df9d-4096-b69c-bd9ae0c2aefb",
+              "name": "Original",
+              "value": "={{ $json.File }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        96
+      ],
+      "id": "c4a96c66-8e73-43a9-942a-6287ec6fb4ca",
+      "name": "FullFile"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        784,
+        32
+      ],
+      "id": "00c6a77a-26ea-45b5-a179-59b68084a032",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Original }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1152,
+        -192
+      ],
+      "id": "73b7977d-4c66-4681-b027-6665d867ce8c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{ $json.Original.split('/').pop() }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "14UpMIJbAXsRecj0THKxM2H3D3wXLa9qc",
+          "mode": "list",
+          "cachedResultName": "Marketing",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/14UpMIJbAXsRecj0THKxM2H3D3wXLa9qc"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1360,
+        -192
+      ],
+      "id": "67d62cc5-d76b-4a87-87f0-61a1435c30c1",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zlniUrJBkZu2JdPG",
+          "name": "Google Drive N8N"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "182",
+          "name": "Only log no filessss updated 555",
+          "img": "",
+          "filer": "",
+          "department": "Marketing",
+          "created_at": "2025-11-20T17:32:35"
+        }
+      },
+      {
+        "json": {
+          "id": "230",
+          "name": "Knowledge Management Updated",
+          "img": "http://localhost:8000/uploads/img/cat/Knowledge-Management-Updated-1764679247_692ede4f33992.jfif",
+          "filer": "http://localhost:8000/uploads/files/cat/Knowledge-Management-Updated_1764764958_69302d1e6fef6.pdf",
+          "department": "Marketing",
+          "created_at": "2025-11-30T14:25:56"
+        }
+      },
+      {
+        "json": {
+          "id": "235",
+          "name": "Software The Traditional Way",
+          "img": "http://localhost:8000/uploads/img/cat/Software-The-Traditional-Way-1764679702_692ee016c6aa9.jpg",
+          "filer": "http://localhost:8000/uploads/files/cat/Software-The-Traditional-Way_1764679703_692ee017620e9.csv",
+          "department": "Marketing",
+          "created_at": "2025-12-01T14:19:11"
+        }
+      },
+      {
+        "json": {
+          "id": "241",
+          "name": "cat2 updated",
+          "img": "",
+          "filer": "",
+          "department": "Marketing",
+          "created_at": "2025-12-02T12:26:30"
+        }
+      },
+      {
+        "json": {
+          "id": "244",
+          "name": "market555",
+          "img": "",
+          "filer": "http://localhost:8000/uploads/files/cat/market555_1764775567_6930568f08471.txt",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:26:07"
+        }
+      },
+      {
+        "json": {
+          "id": "245",
+          "name": "mrket456",
+          "img": "",
+          "filer": "http://localhost:8000/uploads/files/cat/mrket456_1764775610_693056ba334a5.xlsx",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:26:50"
+        }
+      },
+      {
+        "json": {
+          "id": "246",
+          "name": "market7",
+          "img": "",
+          "filer": "",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:27:10"
+        }
+      },
+      {
+        "json": {
+          "id": "247",
+          "name": "market8",
+          "img": "",
+          "filer": "",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:27:46"
+        }
+      },
+      {
+        "json": {
+          "id": "248",
+          "name": "market888",
+          "img": "",
+          "filer": "",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:28:10"
+        }
+      },
+      {
+        "json": {
+          "id": "249",
+          "name": "Markee887tt",
+          "img": "",
+          "filer": "http://localhost:8000/uploads/files/cat/Markee887tt_1764775870_693057be00336.csv",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:31:09"
+        }
+      },
+      {
+        "json": {
+          "id": "250",
+          "name": "MArket99",
+          "img": "",
+          "filer": "http://localhost:8000/uploads/files/cat/MArket99_1764775927_693057f78b894.csv",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:32:07"
+        }
+      },
+      {
+        "json": {
+          "id": "251",
+          "name": "market10",
+          "img": "http://localhost:8000/uploads/img/cat/market10-1764775974_69305826acbd8.jpg",
+          "filer": "http://localhost:8000/uploads/files/cat/market10_1764775975_693058275642b.pdf",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:32:54"
+        }
+      },
+      {
+        "json": {
+          "id": "252",
+          "name": "MArket756",
+          "img": "",
+          "filer": "http://localhost:8000/uploads/files/cat/MArket756_1764776042_6930586ab18c4.docx",
+          "department": "Marketing",
+          "created_at": "2025-12-03T15:34:02"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Marketing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing": {
+      "main": [
+        [
+          {
+            "node": "Count of Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check File exists Then Retrieve Name": {
+      "main": [
+        [
+          {
+            "node": "If File NOT Empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If File NOT Empty": {
+      "main": [
+        [
+          {
+            "node": "Get Relative File Name",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FullFile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Check File exists Then Retrieve Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count of Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Relative File Name": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "FullFile": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Only New Files": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Only New Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9c740bb9-46a9-4456-85fe-b9c1c670726a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "Hw26RvLc1juHbDZA",
+  "tags": []
+}

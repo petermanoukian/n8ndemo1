@@ -1,0 +1,246 @@
+{
+  "name": "Chat - Insert - Category",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        176,
+        -112
+      ],
+      "id": "dd3c8f77-aa83-4c5c-95f7-575d4430b151",
+      "name": "Call 'Centralized Database Settings'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bc3082ff-2360-40f4-8667-17ed5d21fc30",
+              "name": "Department",
+              "value": "={{ $json.body.Department }}",
+              "type": "string"
+            },
+            {
+              "id": "9031ddd6-7fa7-4598-8f9a-e3abdc151437",
+              "name": "catname",
+              "value": "={{ $json.body.catname }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "4bd1bb0c-e9be-4bf2-ad75-5c88d3095d62",
+      "name": "Add Cat Chat Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_IP }}/admin/cats/store",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Add Cat Chat Fields').item.json.catname }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $('Add Cat Chat Fields').item.json.Department }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        -160
+      ],
+      "id": "602056ce-357c-4e5e-8d47-c51a3b765df6",
+      "name": "Call LAravelAdd cat API",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Call \\'Centralized Database Settings\\'').item.json.N8N_FRONTEND }}/webhook/insert-read-first-cat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.data.cat.id }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $json.data.cat.name }}"
+            },
+            {
+              "name": "department",
+              "value": "={{ $json.data.cat.department }}"
+            },
+            {
+              "name": "created_at",
+              "value": "={{ $json.data.cat.created_at.replace('.000000Z', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        608,
+        -192
+      ],
+      "id": "b0b32f0a-2390-4aeb-ade5-c8c54fd23a9a",
+      "name": "Only Text Add to Google Sheets and Message"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatinsertcategory",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -80
+      ],
+      "id": "e865345c-d6a3-4296-9cb6-40f94a23e610",
+      "name": "Webhook",
+      "webhookId": "2e3e3515-d210-4174-a261-3cebaa549c00"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "776224fc-c29d-4b5d-a2f4-b8c75f508d9a",
+              "name": "Message",
+              "value": "=CATEGORY : {{ $('Call LAravelAdd cat API').item.json.data.cat.name }} was added \nto Department {{ $('Add Cat Chat Fields').item.json.body.Department }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        -192
+      ],
+      "id": "d6ab6aa1-c405-4f4c-9181-7ff2185e174c",
+      "name": "Edit Fields",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Call 'Centralized Database Settings'": {
+      "main": [
+        [
+          {
+            "node": "Call LAravelAdd cat API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Cat Chat Fields": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call LAravelAdd cat API": {
+      "main": [
+        [
+          {
+            "node": "Only Text Add to Google Sheets and Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Add Cat Chat Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Text Add to Google Sheets and Message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b8b107f2-e4b5-4a41-850f-b01d03244ca7",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "dgIQloQsXT93SqWl",
+  "tags": []
+}
