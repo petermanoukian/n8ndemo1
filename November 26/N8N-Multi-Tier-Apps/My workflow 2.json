@@ -1,0 +1,103 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cf3f2bc4-a7ae-4da1-8b28-66e4b11ac9e1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0e5bb2bf-5b0e-4abd-849a-f0a8f00da152",
+      "name": "Webhook",
+      "webhookId": "cf3f2bc4-a7ae-4da1-8b28-66e4b11ac9e1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "\"You are a specialized JSON parser. Your ONLY job is to analyze the user's message, find the actual URL provided, and classify its platform type. Respond ONLY with a clean JSON object.\nRULES:\n1.\tFind the URL in the message.\n2.\tClassify type as 'youtube', 'linkedin', 'vimeo', or 'generic_web'.\n3.\tIf no URL is found, set url to 'error_no_url'.\nExample Output: {\\\"url\\\": \\\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\\\", \\\"type\\\": \\\"youtube\\\"}\"\n"
+            }
+          ]
+        },
+        "jsonOutput": "={{ $json.body.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "35e00cad-45a0-476a-ad9f-6d43181a4735",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "T6eQft1B98gDE48O",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the raw JSON string from the Gemini output\nconst geminiText = items[0].json.content.parts[0].text; \n\n// 2. Parse the string into a JavaScript object\nconst parsedData = JSON.parse(geminiText);\n\n// 3. Add the 'source' field required by your Laravel API\nparsedData.source = \"n8n_chat\";\n\n// 4. Return the new, clean JSON object ready for the HTTP Request\nreturn [{ json: parsedData }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "733e7c37-51c3-46dd-85f2-bc408f7bd0af",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a19e3e66-7f7c-4ffb-8108-df3e64f47e52",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "rNlwOnt6biIPxDRg",
+  "tags": []
+}

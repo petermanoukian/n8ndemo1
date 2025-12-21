@@ -1,0 +1,280 @@
+{
+  "name": "Delete Loop Suggestions Delete Sheet",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'totalCount' to each group\nconst rows = items.map(item => item.json);\nconst totalCount = rows.length;\n\nconst grouped = rows.reduce((acc, row) => {\n  const key = row.KnowledgeBase || 'Unknown';\n  acc[key] = acc[key] || [];\n  acc[key].push(row);\n  return acc;\n}, {});\n\nreturn Object.entries(grouped).map(([key, group]) => ({\n  json: {\n    groupKey: key,\n    records: group,\n    totalCount   // total number of rows across all groups\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -272
+      ],
+      "id": "c33f86a2-3f58-468c-8695-89af1dd7fc3a",
+      "name": "Retrieve Google Sheet Records"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wRyw7DyTlioKKc5i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wRyw7DyTlioKKc5i",
+          "cachedResultName": "Logged In Guard Middleware Extended"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        -256
+      ],
+      "id": "28f24114-24c8-4442-959f-b58357261b48",
+      "name": "Call 'Logged In Guard Middleware Extended'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Sheets Items and The Main Settings').item.json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $('Sheets Items and The Main Settings').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"manage-baser-suggestions\",\n    \"arguments\": {\n      \"action\": \"delete_by_sheetid\",\n      \"SuggestionID\": \"{{ $json.SuggestionID }}\"\n    }\n  },\n  \"id\": {{ Math.floor(Math.random() * 1000) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        720,
+        -304
+      ],
+      "id": "fb5cf8d5-5716-46e7-aa8b-f6c14c43495b",
+      "name": "HTTP Request to categories FilterPrompt prperation",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae8b5909-8993-4ccb-ad44-ba0bfa244ae0",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "5dc20846-1241-4cc8-8559-999f2d743f59",
+              "name": "LARAVEL_BACKEND_MCP",
+              "value": "={{ $json.LARAVEL_BACKEND_MCP }}",
+              "type": "string"
+            },
+            {
+              "id": "03ba135e-07db-4b18-bc48-9b077ff723b4",
+              "name": "records",
+              "value": "={{ $('Flatten').item.json.records }}",
+              "type": "array"
+            },
+            {
+              "id": "349e390b-5c88-4278-91ba-81421b73ab9b",
+              "name": "totalCount",
+              "value": "={{ $('Flatten').item.json.totalCount }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        -240
+      ],
+      "id": "7adc81cb-062f-4ba1-a48d-7758027c9dc8",
+      "name": "Sheets Items and The Main Settings",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all incoming items into one array\nconst allRecords = [];\n\nfor (const item of items) {\n  if (item.json.records) {\n    allRecords.push(...item.json.records);\n  } else {\n    allRecords.push(item.json);\n  }\n}\n\nreturn [\n  {\n    json: {\n      records: allRecords,\n      totalCount: allRecords.length\n    }\n  }\n];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -272
+      ],
+      "id": "095cffaa-49d5-4645-b00b-923fc9b08155",
+      "name": "Flatten"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- FINAL MINIMIZED CODE NODE PAYLOAD ---\n// 1. Get the JSON object from the first (and only) incoming item.\nconst inputData = items[0].json;\n// 2. Extract the 'records' array from the input.\nconst recordsToSplit = inputData.records || [];\n// 3. Create a new N8N output item for every record found, selecting only necessary fields.\nconst outputItems = recordsToSplit\n  .filter(record => record.SuggestionID)  // NEW: Skip if SuggestionID falsy/empty\n  .map(record => {\n \n    // --- CLEANUP STEP: Trim whitespace (fixes the JSON validation issue) ---\n    const cleanedKnowledgeBase = (record.KnowledgeBase && typeof record.KnowledgeBase === 'string')\n      ? record.KnowledgeBase.trim()\n      : record.KnowledgeBase;\n   \n    // --- PAYLOAD CONSTRUCTION: Explicitly select ONLY the core data fields ---\n    const minimizedPayload = {\n \n      \"SuggestionID\": record.SuggestionID,\n\n    };\n   \n    // The N8N Code node returns an array of { json: <payload> } objects.\n    return {\n      json: minimizedPayload\n    };\n  });\n// Return the array of new items (only valid ones).\nreturn outputItems;\n// ----------------------------------------------------------------"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        -272
+      ],
+      "id": "14f1a476-0191-4ab6-a3f0-056e2fa64317",
+      "name": "Split and send final parmaters"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -240
+      ],
+      "id": "f571eeef-4dc9-481e-843c-38eeee26d52e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY",
+          "mode": "list",
+          "cachedResultName": "Knowledge Base Suggestions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 997222776,
+          "mode": "list",
+          "cachedResultName": "Delete",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY/edit#gid=997222776"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -416,
+        -256
+      ],
+      "id": "7351b613-bd0d-4e48-83ea-6f24ef4ab6ab",
+      "name": "Delete Sheet Retrieve",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Retrieve Google Sheet Records": {
+      "main": [
+        [
+          {
+            "node": "Flatten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Logged In Guard Middleware Extended'": {
+      "main": [
+        [
+          {
+            "node": "Sheets Items and The Main Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets Items and The Main Settings": {
+      "main": [
+        [
+          {
+            "node": "Split and send final parmaters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten": {
+      "main": [
+        [
+          {
+            "node": "Call 'Logged In Guard Middleware Extended'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split and send final parmaters": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to categories FilterPrompt prperation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Delete Sheet Retrieve",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Sheet Retrieve": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Google Sheet Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9433933e-7ee9-44cd-856c-e7b4c772c1eb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "WdbjLF50L2R0bIzv",
+  "tags": []
+}

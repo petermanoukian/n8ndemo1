@@ -1,0 +1,215 @@
+{
+  "name": "Gemin Chat Model Scrpaer - Version 3",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -352,
+        -64
+      ],
+      "id": "262bad21-8111-42c8-8f8e-18e74f550b0d",
+      "name": "When chat message received",
+      "webhookId": "09bea66b-0803-4969-b09b-1e9c2ad7d8ea"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are an extremely concise and efficient Web Scraper Agent.\n\nTASK: When the user provides a URL and asks a question, your ONLY goal is to perform a single, two-step operation:\n\n1. URL CHECK: If the user's message DOES NOT contain a full URL (starting with http:// or https://), you MUST respond conversationally and politely ask them to provide a URL. DO NOT call the tool.\n2. TOOL CALL: If a URL IS provided, you MUST call the 'website_scraper' tool with the full URL.\n3. FINAL ANSWER: After the tool returns the raw HTML, you MUST immediately analyze the HTML and provide a direct, concise text answer to the user's original question. Do NOT include any filler or commentary.\n\nconst now = Date.now();\nconst elapsed = now - $input.startTime;\n\nif (elapsed > 45000 || !$input.gemini.choices) {\n  return {\n    response: $input.openrouter.choices[0].message.content,\n    source: \"mistral\",\n    fallbackTrigger: true\n  };\n}\n\nreturn {\n  response: $input.gemini.choices[0].message.content,\n  source: \"gemini\",\n  fallbackTrigger: false\n};\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        64,
+        -64
+      ],
+      "id": "949de861-9779-43b3-ac6c-9ad3e7fe827a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        176
+      ],
+      "id": "4f25b233-4c4c-44e6-a395-5f7ffc762e10",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "q9Rz3cLjfg67ar1a",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "A tool to fetch the raw HTML content of a website. Use this tool when the user asks to scrape or extract data from a specific website URL. Arguments: {\"url\": \"The full URL of the website to scrape.\"}",
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        208
+      ],
+      "id": "84b8dcbb-1976-423b-899f-1519263216ff",
+      "name": "website_scraper"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.response }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        544,
+        -48
+      ],
+      "id": "86afe778-7440-44fa-9c62-4e7656a3d72d",
+      "name": "Respond to Chat"
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        64,
+        224
+      ],
+      "id": "3b95532c-f5df-42bd-847c-692681235252",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "erk8MM8mMAO1C6Qx",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2e9305f-2e44-4337-ad6c-f7ca99990bd2",
+              "name": "startTime",
+              "value": "={{ Date.now() }}",
+              "type": "number"
+            },
+            {
+              "id": "ddfbb8bc-4cdc-4f76-bc61-88f1ef874f20",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -80
+      ],
+      "id": "9a76e4c6-2e25-4b63-aa4a-a7fdefeb8322",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "website_scraper": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fd024cc0-9a3f-4477-97b2-6a9d5b91e5a1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "X10z80QBVw5WBtv3",
+  "tags": []
+}

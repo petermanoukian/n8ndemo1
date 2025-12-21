@@ -1,0 +1,454 @@
+{
+  "name": "Laravel token Sub Flow New Version",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "token": "={{ $('Start').item.json.token }}",
+            "Date Added": "={{ $now }}",
+            "ipaddress": "={{ $('Start').item.json.ip }}",
+            "Email": "={{ $('Start').item.json.email }}",
+            "OperationType": "Insert"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "token",
+              "displayName": "token",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Added",
+              "displayName": "Date Added",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ipaddress",
+              "displayName": "ipaddress",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "OperationType",
+              "displayName": "OperationType",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        -752
+      ],
+      "id": "ea8a913c-9d01-498c-b920-78b2b9eb63c1",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0",
+          "mode": "list",
+          "cachedResultName": "Login Activity",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "FirstTimeLogin",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Merge').item.json.fields.Email }}",
+            "IP Address": "={{ $('Create a record').item.json.fields.ipaddress }}",
+            "Token": "={{ $('Create a record').item.json.fields.token }}",
+            "DateAdded": "={{ $('Create a record').item.json.fields[\"Date Added\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Token",
+              "displayName": "Token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IP Address",
+              "displayName": "IP Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DateAdded",
+              "displayName": "DateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        -400
+      ],
+      "id": "c3eca249-9bf1-47d7-9f61-20161325457d",
+      "name": "Insert New Logged in User Data",
+      "notesInFlow": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "Logged in and added to Airtable database",
+        "message": "=Logged in and added to Airtable database<br> Email: {{ $json.fields.Email }} \n<br> Token: {{ $json.fields.token }} < <br> IP Address: {{ $json.fields.ipaddress }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        -736
+      ],
+      "id": "ec8afead-d04d-4c8e-8d7b-e0806f6346e0",
+      "name": "New Logged in User Notification",
+      "webhookId": "ed41f61a-5c0b-4ba1-a14a-5962e533c959",
+      "notesInFlow": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "token",
+              "type": "any"
+            },
+            {
+              "name": "ip",
+              "type": "any"
+            },
+            {
+              "name": "email",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "3c4f10ed-74cd-465b-ba10-4842ce479bab",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -752,
+        -384
+      ],
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2abcf18-231e-490d-9bfc-6ff6c9981887",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "c37fa373-2224-43f9-85ef-426cae35e797",
+              "name": "ip",
+              "value": "={{ $json.ip }}",
+              "type": "string"
+            },
+            {
+              "id": "258f382c-cf6d-40d9-b4a8-b6840a1caacf",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        -448
+      ],
+      "id": "5820f525-c1a4-43d2-b427-42ccc8544ceb",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        -640
+      ],
+      "id": "fab6ad75-de31-4ba1-96de-ff047a92d631",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -640
+      ],
+      "id": "5001cd0a-3ce2-48f2-a560-7c9bacb4c544",
+      "name": "Datatable Central Settings"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/eventmanagemtnadmin",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1104,
+        -544
+      ],
+      "id": "0277b7ac-ba41-40ad-98db-ab50c85256e7",
+      "name": "Redirect to Dashboard",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<h2>Logged In - Dashboard Ready</h2>\n<p>Redirecting to dashboard...</p>\n<script>\n  setTimeout(() => {\n    window.location.href = '{{ $('Datatable Central Settings').item.json.value }}/webhook/eventmanagemtnadmin';  // Your dashboard content URL\n  }, 1000);\n</script>\n<a href=\"{{ $('Datatable Central Settings').item.json.value }}/webhook/dashboard2\">Click to continue</a>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1264,
+        -752
+      ],
+      "id": "8afd9947-3fe2-4983-aedd-341c1ad43468",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "New Logged in User Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Logged in User Notification": {
+      "main": [
+        [
+          {
+            "node": "Insert New Logged in User Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert New Logged in User Data": {
+      "main": [
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Redirect to Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatable Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redirect to Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "89e7e12c-f068-43ba-b08f-4777d27fb5d6",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "5H50Ky663XXQZe2C",
+  "tags": []
+}
