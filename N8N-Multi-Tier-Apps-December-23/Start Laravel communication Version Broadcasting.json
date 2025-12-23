@@ -1,0 +1,447 @@
+{
+  "name": "Start Laravel communication Version Broadcasting",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "broadcastingentry",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2480,
+        -512
+      ],
+      "id": "a53374bf-6df5-4ff1-b3cf-2fc0266f348c",
+      "name": "LoginEntry",
+      "webhookId": "1cf736df-2956-4bce-b6b0-34f7c421b5e6"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API2 }}/check-auth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" +$json.token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1728,
+        -608
+      ],
+      "id": "d962774c-cf4b-4787-b31d-521d9dbf8eaf",
+      "name": "check authenthcation",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Redirecting...</title>\n  <meta http-equiv=\"refresh\" content=\"3; url={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/f9a064a6-60e2-4261-bd48-5151c18dccbb?N8N_FRONTEND={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}\">\n</head>\n<body style=\"font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f8ff;\">\n  <h2>We wil take you to the Event broadcasting login page now</h2>\n  <p>Now we wil go to the login form in a moment...</p>\n  <p>The link is:\n  <a href = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/f9a064a6-60e2-4261-bd48-5151c18dccbb?N8N_FRONTEND={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}' target ='_blank'>\n  &raquo; Laravel Login to Broadcasting Event System </a> </p>\n  <p id=\"status\" style=\"color: #666;\">If it doesn't open, you'll be redirected shortly.</p>\n \n  <script>\n    (function() {\n      const formUrl = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/f9a064a6-60e2-4261-bd48-5151c18dccbb?N8N_FRONTEND={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}';\n     \n      // Try to open in new window immediately (most browsers allow in response context)\n      const newWindow = window.open(formUrl, '_blank', 'width=600,height=700,scrollbars=yes,resizable=yes');\n     \n      if (newWindow) {\n        // Success: Update status and close this tab after delay\n        document.getElementById('status').textContent = 'Form opened in new window! Closing this page...';\n        setTimeout(() => { window.close(); }, 2000);\n      } else {\n        // Blocked: Rely on meta redirect (current tab jumps to form)\n        document.getElementById('status').textContent = 'Popup blocked—redirecting to form now.';\n      }\n    })();\n  </script>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1280,
+        -336
+      ],
+      "id": "c57734ce-8a13-4899-9c91-fe457d92f9eb",
+      "name": "redirect to login"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -2304,
+        -576
+      ],
+      "id": "ee15ff8b-87be-4878-b41e-fe04545c5c25",
+      "name": "Datatabel Central Settings"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2096,
+        -576
+      ],
+      "id": "e56d7d03-f85b-4b8b-a970-0901ef3fa7e9",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $json.MyIP2 }}\"\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -1904,
+        -608
+      ],
+      "id": "3a517c7f-5dac-4982-8267-f520b39c812b",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbf06720-82a4-4b0b-89c2-d11315d9851a",
+              "leftValue": "={{ Number($json.isauthenticatedbysanctumfirstcheck) }}",
+              "rightValue": "414",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1648,
+        -352
+      ],
+      "id": "d155f5f7-6d09-43ec-9589-e3916698395a",
+      "name": "If Logged in"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0",
+          "mode": "list",
+          "cachedResultName": "Login Activity",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1111960932,
+          "mode": "list",
+          "cachedResultName": "ReturnedLogin",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0/edit#gid=1111960932"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('If Logged in').item.json.user.email }}",
+            "Token": "={{ $('Retrieve Token By IP Address').item.json.token }}",
+            "IP Address": "={{ $('Retrieve Token By IP Address').item.json.ipaddress }}",
+            "DateAdded": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Token",
+              "displayName": "Token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IP Address",
+              "displayName": "IP Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DateAdded",
+              "displayName": "DateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1216,
+        -832
+      ],
+      "id": "bf38d89b-511f-4e21-a990-a97e06bf545e",
+      "name": "Insert Already Logged in record to google sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "we have a logged in user",
+        "message": "=we have a logged in user <br>  {{ $json.user.email }} is already logged in \n<br> with token{{ $('Retrieve Token By IP Address').item.json.token }}",
+        "options": {
+          "appendAttribution": false,
+          "ccList": "={{ $json.user.email }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1504,
+        -720
+      ],
+      "id": "790bf333-3e11-4d14-9f97-d87dcff39b25",
+      "name": "Notify that  user is already logged in",
+      "webhookId": "453ab2e6-d587-451c-9bc3-efdfa19cd01f",
+      "notesInFlow": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/eventmanagemtnadmin",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -976,
+        -928
+      ],
+      "id": "afd39753-857d-4d5a-97f8-4f3252e969a0",
+      "name": "Redirect to Dashboard",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<h2>Logged In - Dashboard Ready</h2>\n<p>Redirecting to dashboard...</p>\n<script>\n  setTimeout(() => {\n    window.location.href = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/eventmanagemtnadmin';  // Your dashboard content URL\n  }, 1000);\n</script>\n<a href=\"{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/eventmanagemtnadmin\">Click to continue</a>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -736,
+        -912
+      ],
+      "id": "c99f09f6-123b-41c2-af4a-75c610530c85",
+      "name": "Welcome"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "LoginEntry": {
+      "main": [
+        [
+          {
+            "node": "Datatabel Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check authenthcation": {
+      "main": [
+        [
+          {
+            "node": "If Logged in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatabel Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Token By IP Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Token By IP Address": {
+      "main": [
+        [
+          {
+            "node": "check authenthcation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Logged in": {
+      "main": [
+        [
+          {
+            "node": "Notify that  user is already logged in",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "redirect to login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Already Logged in record to google sheet": {
+      "main": [
+        [
+          {
+            "node": "Redirect to Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redirect to Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify that  user is already logged in": {
+      "main": [
+        [
+          {
+            "node": "Insert Already Logged in record to google sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redirect to Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "d9fc5b98-ffae-466f-a621-9d46c6b6e646",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "ZqwZcr6YazI1BYdg",
+  "tags": []
+}

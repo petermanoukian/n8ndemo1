@@ -1,0 +1,641 @@
+{
+  "name": "MCP-Entry",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2176,
+        -608
+      ],
+      "id": "f1e0f0c0-f25f-4980-b9bf-59afcbb1d7c2",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wRyw7DyTlioKKc5i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wRyw7DyTlioKKc5i",
+          "cachedResultName": "Logged In Guard Middleware Extended"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1808,
+        -704
+      ],
+      "id": "91c7430f-a5b1-4dc6-9c33-7b4fd503398d",
+      "name": "Call 'Logged In Guard Middleware Extended'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1001,\n  \"method\": \"resources/read\",\n  \"params\": {\n    \"uri\": \"knowledge://categories\"\n  }\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1936,
+        -208
+      ],
+      "id": "d1afe4db-7a4e-4af2-ae1a-f0281476b3ea",
+      "name": "HTTP Request to categories Resource"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.department }}",
+                    "rightValue": "Marketing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4cc2fed5-5859-462d-84bb-226258aacb6a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Marketing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "370966e1-087c-4ac4-8449-bad045be1867",
+                    "leftValue": "={{ $json.department }}",
+                    "rightValue": "Sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sales"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d33c37dc-d65d-4cc6-b7ac-9cb56e420b0c",
+                    "leftValue": "={{ $json.department }}",
+                    "rightValue": "HR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "HR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "22706701-8533-45b2-8fca-d8ea2fdb0747",
+                    "leftValue": "={{ $json.department }}",
+                    "rightValue": "PR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f21e7299-544f-4a41-a19b-f24ddd2a9eda",
+                    "leftValue": "={{ $json.department }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1136,
+        -384
+      ],
+      "id": "62e93ae4-1af2-4729-8083-8b52eb1a0a6d",
+      "name": "Switch",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Helper: prefix relative paths with backend base\nfunction withBase(base, path) {\n  if (!path) return '';\n  // If already absolute (http/https), return as-is\n  if (/^https?:\\/\\//i.test(path)) return path;\n  // If path starts with '/', prepend base directly\n  if (path.startsWith('/')) {\n    return base.replace(/\\/+$/, '') + path;\n  }\n  // Otherwise, ensure single slash between base and path\n  return base.replace(/\\/+$/, '') + '/' + path.replace(/^\\/+/, '');\n}\n\nconst base = $json.LARAVEL_BACKEND || 'http://localhost:8000';\nconst raw = items[0].json.result.contents[0].text;\nconst categories = JSON.parse(raw);\n\nreturn categories.map(cat => {\n  const img   = cat.img   ? withBase(base, cat.img)   : '';\n  const img2  = cat.img2  ? withBase(base, cat.img2)  : '';\n  const filer = cat.filer ? withBase(base, cat.filer) : '';\n\n  let createdAt = cat.created_at || '';\n  if (createdAt) {\n    createdAt = createdAt.replace(/\\.\\d+Z$/, ''); // \"2025-11-27T17:10:15\"\n  }\n\n  return {\n    json: {\n      id: cat.id,\n      name: cat.name,\n      img,\n      img2,\n      filer,\n      department: cat.department || '',\n      created_at: createdAt,\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1568,
+        -336
+      ],
+      "id": "acb72c44-743e-409a-8aca-fd9d623df4aa",
+      "name": "Normalizing the Category Results"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "4E41t5URMsPzgI6a",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/4E41t5URMsPzgI6a",
+          "cachedResultName": "MCP-Resouce-All-Google-Sheets-Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1152,
+        -640
+      ],
+      "id": "7373dd2b-2b86-4130-bace-bd48a06c9c64",
+      "name": "MCP Resource ALL Google Sheet Google Drive"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FEIOCSMd3xOQ6XwZ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/FEIOCSMd3xOQ6XwZ",
+          "cachedResultName": "MCP Resource HR Google Sheet Google Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -672,
+        -416
+      ],
+      "id": "152ad2e5-4062-4e88-bb32-e82152e92459",
+      "name": "MCP-Resource-HR-Google-Sheets-Drive"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "XTkGmJccc7UuihZv",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/XTkGmJccc7UuihZv",
+          "cachedResultName": "MCP-Resouce-Sales-Google-Sheets-Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "name": "={{ $json.name }}",
+            "img": "={{ $json.img }}",
+            "filer": "={{ $json.filer }}",
+            "department": "={{ $json.department }}",
+            "created_at": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "img",
+              "displayName": "img",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filer",
+              "displayName": "filer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -832,
+        -544
+      ],
+      "id": "f35aaa41-94f3-41e2-b7b4-693fa757859a",
+      "name": "MCP-Resource-Sales-Google-Sheets-Drive",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Hw26RvLc1juHbDZA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Hw26RvLc1juHbDZA",
+          "cachedResultName": "MCP-Resouce-Marketing-Google-Sheets-Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "name": "={{ $json.name }}",
+            "img": "={{ $json.img }}",
+            "filer": "={{ $json.filer }}",
+            "department": "={{ $json.department }}",
+            "created_at": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "img",
+              "displayName": "img",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "filer",
+              "displayName": "filer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -832,
+        -720
+      ],
+      "id": "65e11d3f-8393-4f01-9a06-4fd4f7d84e85",
+      "name": "MCP-Resource-Marketing-Google-Sheets-Drive",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "rAX05bgusMIcvnqf",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/rAX05bgusMIcvnqf",
+          "cachedResultName": "MCP Resource PR Google Sheet Google Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -688,
+        -224
+      ],
+      "id": "b1356b1d-8db5-4594-a158-9d434f0f32bd",
+      "name": "MCP Resource PR Google Sheet Google Drive copy'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kpEO1jdcRI4OPvYw",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kpEO1jdcRI4OPvYw",
+          "cachedResultName": "MCP Resource EMPTY Google Sheet Google Drive"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -976,
+        -80
+      ],
+      "id": "b04fa94f-1e1e-414e-a230-e12155737202",
+      "name": "MCP Resource EMPTY Google Sheet Google Drive",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Call 'Logged In Guard Middleware Extended'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Logged In Guard Middleware Extended'": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to categories Resource",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to categories Resource": {
+      "main": [
+        [
+          {
+            "node": "Normalizing the Category Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "MCP-Resource-Marketing-Google-Sheets-Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MCP-Resource-Sales-Google-Sheets-Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MCP-Resource-HR-Google-Sheets-Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MCP Resource PR Google Sheet Google Drive copy'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MCP Resource EMPTY Google Sheet Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizing the Category Results": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MCP Resource ALL Google Sheet Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP-Resource-Marketing-Google-Sheets-Drive": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2422e57e-5ca3-44c7-a20c-999b368f4b44",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "tGvYXrDAXN5ZTrNP",
+  "tags": []
+}

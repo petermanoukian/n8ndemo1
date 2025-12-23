@@ -1,0 +1,302 @@
+{
+  "name": "Standalone Auth Guard Event MN version",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "guard-EventMN-Version",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        -128
+      ],
+      "id": "f4f1a4fc-9b95-4a57-a706-f8c5c4f1f4eb",
+      "name": "Webhook",
+      "webhookId": "a7504fa0-f5d9-472b-8cec-dfa6daf477d6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbf06720-82a4-4b0b-89c2-d11315d9851a",
+              "leftValue": "={{ Number($json.isauthenticatedbysanctumfirstcheck) }}",
+              "rightValue": "414",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -288
+      ],
+      "id": "f9f6a751-b57c-46d7-8133-a85a6b8d833c",
+      "name": "If Logged in"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $json.MyIP2 }}\"\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        -224
+      ],
+      "id": "e684cdf4-943e-4e14-8f19-176946614ff1",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        -176
+      ],
+      "id": "4edbfa3b-bdd9-41dc-b8a4-bd2917624bd1",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -160
+      ],
+      "id": "7a8d2bcf-a1d4-4ea5-bb51-e32aeb314863",
+      "name": "Datatabel Central Settings"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Redirecting...</title>\n\n  <meta http-equiv=\"refresh\" content=\"3; url={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/f9a064a6-60e2-4261-bd48-5151c18dccbb\">\n</head>\n<body style=\"font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f8ff;\">\n  <h2>We wil take you to the login page now</h2>\n  <p>Now we wil go to the login form in a moment...</p>\n<p>The link is: \n\n<a href = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/f9a064a6-60e2-4261-bd48-5151c18dccbb' target ='_blank'> \n\n&raquo; Laravel Event MultiBroadcast Login </a> </p>\n  <p id=\"status\" style=\"color: #666;\">If it doesn't open, you'll be redirected shortly.</p>\n  \n  <script>\n    (function() {\n      const formUrl = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/f9a064a6-60e2-4261-bd48-5151c18dccbb';\n      \n      // Try to open in new window immediately (most browsers allow in response context)\n      const newWindow = window.open(formUrl, '_blank', 'width=600,height=700,scrollbars=yes,resizable=yes');\n      \n      if (newWindow) {\n        // Success: Update status and close this tab after delay\n        document.getElementById('status').textContent = 'Form opened in new window! Closing this page...';\n        setTimeout(() => { window.close(); }, 2000);\n      } else {\n        // Blocked: Rely on meta redirect (current tab jumps to form)\n        document.getElementById('status').textContent = 'Popup blocked—redirecting to form now.';\n      }\n    })();\n  </script>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        912,
+        -176
+      ],
+      "id": "b85bd40d-7bdf-4394-af67-0b11e3474516",
+      "name": "redirect to login"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API2 }}/check-auth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" +$json.token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        240,
+        -256
+      ],
+      "id": "560804b3-ba11-4110-a746-bbab4c8634ae",
+      "name": "check authenthcation",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"not_logged_in\",\n  \"message\": \"Not Logged In\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        672,
+        -144
+      ],
+      "id": "c8047580-a41b-42c3-98fc-e8940f1ef045",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"logged_in\",\n  \"message\": \"Dashboard ready, welcome\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        688,
+        -432
+      ],
+      "id": "046b7ffe-11e5-446c-a778-fe21ad79fa8e",
+      "name": "Loggedin"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If Logged in": {
+      "main": [
+        [
+          {
+            "node": "Loggedin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Token By IP Address": {
+      "main": [
+        [
+          {
+            "node": "check authenthcation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Token By IP Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatabel Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check authenthcation": {
+      "main": [
+        [
+          {
+            "node": "If Logged in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Datatabel Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redirect to login": {
+      "main": [
+        []
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "redirect to login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0809e81f-83a6-4d81-b5ac-739562217dd6",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "bMINg6mJHDpv7yLs",
+  "tags": []
+}

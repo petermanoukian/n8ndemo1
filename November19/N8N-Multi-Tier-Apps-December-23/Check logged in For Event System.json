@@ -1,0 +1,205 @@
+{
+  "name": "Check logged in For Event System",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $json.MyIP2 }}\"\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        -224
+      ],
+      "id": "51528410-7601-45c3-a256-3f4b61193ac5",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -176
+      ],
+      "id": "b40f68bd-9647-4837-9393-4cd70c0ae762",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -160
+      ],
+      "id": "346821e4-3db1-4999-ab61-d022bd12ab52",
+      "name": "Datatabel Central Settings"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -256
+      ],
+      "id": "1f6f2f3d-dbe6-4ab7-ae5e-5f8c5d2d3b5b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Datatabel Central Settings').all().find(item => item.json.key === 'N8N_FRONTEND').json.value }}/webhook/eventmanagemtnadmin",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        400,
+        -288
+      ],
+      "id": "b92fe558-3129-46e5-b646-70eff940ecf0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1ca9c34-48f7-4083-ba00-35258a67121e",
+              "name": "status",
+              "value": "={{ $('Retrieve Token By IP Address').first()?.json?.id ? \"alreadyLoggedIn\" : \"notLoggedIn\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -288
+      ],
+      "id": "183c9a35-332d-42a9-8040-a099fdec6825",
+      "name": "Final Result",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "email": "bediktest@gmail.com",
+          "password": "12345678",
+          "remember": [],
+          "submittedAt": "2025-12-21T05:17:41.649-05:00",
+          "formMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Retrieve Token By IP Address": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Token By IP Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatabel Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Datatabel Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c733145f-a8b4-496d-9465-c95d6c86030c",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "npHQaC88qDhSvJcd",
+  "tags": []
+}

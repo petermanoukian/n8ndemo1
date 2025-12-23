@@ -1,0 +1,247 @@
+{
+  "name": "Dashboard Version 2 Event Maganegment",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -80
+      ],
+      "id": "a7e04a0b-3121-44e0-8c92-dc2939a73a7d",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -48
+      ],
+      "id": "09ee7373-b1fb-41ab-a456-d39dc25cd0a9",
+      "name": "Datatable Central Settings"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/guard-EventMN-Version",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        -48
+      ],
+      "id": "d6e5d0fa-7304-4cd0-aa78-281bdb0876ab",
+      "name": "Call the Middleware"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dbf4d909-6c3f-447c-9bf9-e1f112bef9ad",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "logged_in",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -64
+      ],
+      "id": "d04fa7a2-4336-4211-994b-052fb2fa551a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        -288
+      ],
+      "id": "80e4316d-887b-4583-8ffb-75454c274c68",
+      "name": "Form",
+      "webhookId": "5a729ac2-4e15-4341-8eda-173946ec1731"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "eventmanagemtnadmin",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        -16
+      ],
+      "id": "3b2f7850-1b64-47bf-a375-bbc270879a64",
+      "name": "eventmanagemtnadmin",
+      "webhookId": "74e56040-a4e9-44ee-b818-54732e703432",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<html>\n<body>\n  <h1>Welcome to Event Broadcasting backend</h1>\n  </p>\n<p>\n  <a href=\"{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/logoutbroadcast\" onclick=\"if(confirm('Logout?')) this.href += '?confirm=true';\">Logout</a>\n</p>\n<p>\n  <a href=\"{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/394b3921-858b-4b16-8724-84aab5c33838\">Add Category To Event Broadcasting</a>\n</p>\n\n<p>\n  <a href=\"{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/retrievecategories\">Retrieve categories</a>\n</p>\n\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        736,
+        -224
+      ],
+      "id": "19c8f1ee-850a-45c9-aada-4af150c541d0",
+      "name": "Welcome Page"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<h2>Not Logged In</h2>\n<p>Redirecting to Broadcasting sytem login...</p>\n<script>\n  setTimeout(() => {\n    window.location.href = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/broadcastingentry';  \n  }, 1000);\n</script>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        800,
+        96
+      ],
+      "id": "c9269ca7-0903-46e9-bab7-aa9a5e89cb33",
+      "name": "Redirect to Login"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Call the Middleware",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatable Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call the Middleware": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Welcome Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redirect to Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "eventmanagemtnadmin": {
+      "main": [
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Welcome Page": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9412c72f-5dc4-4cee-a7bd-927406a4fae2",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "0BvOxVi2d6Wb1FMF",
+  "tags": []
+}
