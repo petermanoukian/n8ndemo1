@@ -1,0 +1,433 @@
+{
+  "name": "Knowledge Base Resource Retrieval",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wRyw7DyTlioKKc5i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wRyw7DyTlioKKc5i",
+          "cachedResultName": "Logged In Guard Middleware Extended"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -64
+      ],
+      "id": "83d2f305-b5d3-4f5f-9d76-35189b8a62f5",
+      "name": "Call 'Logged In Guard Middleware Extended'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1001,\n  \"method\": \"resources/read\",\n  \"params\": {\n    \"uri\": \"knowledge://knowledge-entries\"\n  }\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        -48
+      ],
+      "id": "2d82009a-d8d0-485d-8a62-20b09a1b0483",
+      "name": "HTTP Request to Knowledge Base Resource"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -16
+      ],
+      "id": "ea052966-4e20-4d12-905f-6d7f0f2b6fd1",
+      "name": "Start Knoweldge Base Resource Retrieval Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Helper: prefix relative paths with backend base\nfunction withBase(base, path) {\n  if (!path) return '';\n  if (/^https?:\\/\\//i.test(path)) return path;\n  if (path.startsWith('/')) {\n    return base.replace(/\\/+$/, '') + path;\n  }\n  return base.replace(/\\/+$/, '') + '/' + path.replace(/^\\/+/, '');\n}\n\nconst base = $json.LARAVEL_BACKEND || 'http://localhost:8000';\n\n// Step 1: parse the outer wrapper\nconst outer = JSON.parse(items[0].json.result.contents[0].text);\n\n// Step 2: parse the inner text which is the actual entries array\nconst entries = JSON.parse(outer.contents[0].text);\n\nreturn entries.map(entry => {\n  const kbFile = entry.knowledgebasefile ? withBase(base, entry.knowledgebasefile) : '';\n  const kbImg  = entry.knowledgebaseimg ? withBase(base, entry.knowledgebaseimg) : '';\n  const catFile = entry.cat?.categoryfile ? withBase(base, entry.cat.categoryfile) : '';\n\n  return {\n    json: {\n      id: entry.id,\n      name: entry.name,\n      catid: entry.catid,\n      description: entry.des || '',\n      description_html: entry.dess || '',\n      dater: entry.dater,\n      knowledgebasefile: kbFile,\n      knowledgebaseimg: kbImg,\n      category_id: entry.cat?.id || '',\n      category_name: entry.cat?.name || '',\n      category_department: entry.cat?.department || '',\n      categoryfile: catFile,\n    }\n  };\n});\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -144
+      ],
+      "id": "8df4b816-c992-46c4-9b8a-5d3b3dabb280",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the outer wrapper from the MCP response\nconst outer = JSON.parse(items[0].json.result.contents[0].text);\n\n// Extract the count directly\nconst itemCount = outer.count;\n\nreturn [\n  {\n    json: {\n      batchSize: itemCount\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        32
+      ],
+      "id": "56389bd2-12f5-4bb0-b36b-0d9dafa7da45",
+      "name": "Count of Items",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $json.batchSize }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        304,
+        -112
+      ],
+      "id": "9720c7f3-05d3-4b74-b439-167f9b643751",
+      "name": "Loop Over Items",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblaKrEWsOyM3S21m",
+          "mode": "list",
+          "cachedResultName": "KnowledgeBase",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblaKrEWsOyM3S21m"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "baseid": "={{ $json.id }}",
+            "Catid": "={{ $json.catid }}",
+            "Title": "={{ $json.name }}",
+            "shortdescription": "={{ $json.description }}",
+            "longdescription": "={{ $json.description_html }}",
+            "file": "={{ $json.knowledgebasefile }}",
+            "image": "={{ $json.knowledgebaseimg }}",
+            "categorytitle": "={{ $json.category_name }}",
+            "department": "={{ $json.category_department }}",
+            "categoryfile": "={{ $json.categoryfile }}",
+            "Date Added": "={{ $json.dater }}"
+          },
+          "matchingColumns": [
+            "baseid"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "baseid",
+              "displayName": "baseid",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Catid",
+              "displayName": "Catid",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "shortdescription",
+              "displayName": "shortdescription",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "longdescription",
+              "displayName": "longdescription",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Added",
+              "displayName": "Date Added",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file",
+              "displayName": "file",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categorytitle",
+              "displayName": "categorytitle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categoryfile",
+              "displayName": "categoryfile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        -304
+      ],
+      "id": "c73d1c5e-f0ba-4c23-8a59-73f6975599e5",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        -112
+      ],
+      "id": "a12dd6ec-bda3-41c4-a72d-019ccc7e03ad",
+      "name": "Wait",
+      "webhookId": "0ea99c32-19a4-4909-b1ca-a629418fb362"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO knowledgebase (\n  baseid,\n  Catid,\n  Title,\n  shortdescription,\n  longdescription,\n  `Date Added`,\n  file,\n  categorytitle,\n  image,\n  department,\n  categoryfile\n)\nVALUES (\n  {{ $json.id }},\n  {{ $json.catid }},\n  '{{ $json.name }}',\n  '{{ $json.description }}',\n  '{{ $json.description_html }}',\n  '{{ $json.dater }}',\n  '{{ $json.knowledgebasefile }}',\n  '{{ $json.category_name }}',\n  '{{ $json.knowledgebaseimg }}',\n  '{{ $json.category_department }}',\n  '{{ $json.categoryfile }}'\n)\nON DUPLICATE KEY UPDATE\n  Catid = VALUES(Catid),\n  Title = VALUES(Title),\n  shortdescription = VALUES(shortdescription),\n  longdescription = VALUES(longdescription),\n  `Date Added` = VALUES(`Date Added`),\n  file = VALUES(file),\n  categorytitle = VALUES(categorytitle),\n  image = VALUES(image),\n  department = VALUES(department),\n  categoryfile = VALUES(categoryfile)",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        720,
+        -112
+      ],
+      "id": "c631ccb6-fea6-4f34-8b13-4b66e0717035",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "2lKug6PdOc5btt3K",
+          "name": "Central N8N Database"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Call 'Logged In Guard Middleware Extended'": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Knowledge Base Resource",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Knoweldge Base Resource Retrieval Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'Logged In Guard Middleware Extended'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Knowledge Base Resource": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Count of Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count of Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "264aed35-0118-45e8-b2fb-d8112516f1d6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "0pHKO8HNieQNyRb4",
+  "tags": []
+}

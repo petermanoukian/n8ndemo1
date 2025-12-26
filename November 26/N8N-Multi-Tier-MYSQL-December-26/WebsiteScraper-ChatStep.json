@@ -1,0 +1,396 @@
+{
+  "name": "WebsiteScraper-ChatStep",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2496,
+        -656
+      ],
+      "id": "1e53ea16-1b4f-4645-9d50-15c8b5dedbc4",
+      "name": "When chat message received",
+      "webhookId": "d69be569-e7d6-437b-b8e9-c6f1ad354790"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        -448
+      ],
+      "id": "32107ef3-4394-4922-b89f-f123e66bbdb4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KJf8tt07cth4UefJ",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        -448
+      ],
+      "id": "22c1dc26-a909-474a-ae54-4fd0e033c5d1",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "CxYvMkMbr40cBdGm",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=You are a simple AI assistant that works in two modes:\nINPUTS:\n- User Request: {{ $json.chatInput }}\n- Page Content: {{ $json.pageContent ? $json.pageContent.body : '' }}\n- Extracted URL: {{ $json.chatInput.match(/https?:\\/\\/[^\\s]+/)?.[0] || '' }}\n\nLOGIC:\n1. SCRAPE MODE\n- Enter this mode if:\n  - The user explicitly says \"scrape\", \"get info from\", \"analyze\", \"summarize\", or similar about a URL/website.\n  - OR the query asks for specific details from a detected URL (e.g., \"title of\", \"what's on\", \"content from\", \"headlines in\") AND Page Content is available.\n- If in scrape mode:\n  - Use ONLY the provided Page Content to answer – extract exactly what's requested (e.g., title from <title> tag, summary from body text).\n  - Do NOT hallucinate, guess, or mention browsing limitations – act as if you have the content.\n  - If Page Content is empty or irrelevant, respond: \"EXTRACTION FAILURE: Content could not be analyzed.\"\n  - Keep responses concise and directly answer the query.\n  - Respond with the Page Content as plain text, but wrap it in bold if it's a title or use bullets if it's a list.\n2. GENERAL CHAT MODE\n- Default to this if NOT in scrape mode (e.g., no URL mentioned or no Page Content available).\n- Respond normally as a helpful assistant using your knowledge.\n- For version queries (e.g., software like Laravel), provide the latest known info and suggest checking official sources for real-time updates.\n\nPRIORITY:\n- Always prioritize provided Page Content when a URL is involved.\n- Only use inputs – no external assumptions.\n- Be direct and helpful.\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1840,
+        -624
+      ],
+      "id": "ff7cb36e-9fa6-4d4a-a136-bc0955189fc0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2484c91e-a999-41f7-b7e4-8d8d33d80f63",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "=https?://[^\\s]+",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2160,
+        -672
+      ],
+      "id": "49c7228c-e2b7-43aa-a3be-73ede656a97b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.extractedUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2512,
+        -960
+      ],
+      "id": "2e94e2dc-8fc4-4887-b477-4c6ddf82467c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd7adba9-eda1-4da2-b168-845645231cb0",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "b72cc0d1-fcb6-4ccf-a3af-ff7de1ef46ac",
+              "name": "startTime",
+              "value": "={{ Date.now() }}",
+              "type": "number"
+            },
+            {
+              "id": "93ac44a4-35c6-4796-a08d-a8927743035e",
+              "name": "extractedUrl",
+              "value": "={{ $json.chatInput.match(/https?:\\/\\/[^\\s]+/) ? $json.chatInput.match(/https?:\\/\\/[^\\s]+/)[0] : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "c9fa4a0e-1286-4236-962d-be9e8b802c91",
+              "name": "pageContent",
+              "value": "={{ { \"body\": '' } }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2336,
+        -704
+      ],
+      "id": "54ed8e99-b4ac-41f6-86f7-1122c57a2a31",
+      "name": "Set Chat Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "52cc4734-ee9d-480d-9cd2-6f7fde9a8db2",
+              "name": "chatInput",
+              "value": "={{ $node[\"Set Chat Input\"].json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "0fb14d08-ea12-4fb5-8021-5b5357c2912f",
+              "name": "pageContent",
+              "value": "={{ { \"body\": $json.title || 'No title extracted' } }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1920,
+        -944
+      ],
+      "id": "d6639318-8571-4919-aa9d-cdd51a85cdec",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "runCustomScript",
+        "scriptCode": "=// Full self-contained script: Loads URL, waits for YouTube, extracts title with better selectors\nconst targetUrl = $input.first().json.chatInput.match(/https?:\\/\\/[^\\s]+/)?.[0] || '';\nif (!targetUrl) return [{ json: { title: 'No URL provided' } }];\n// Stealth headers\nawait $page.setExtraHTTPHeaders({\n  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',\n  'Accept-Language': 'en-US,en;q=0.9',\n  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'\n});\n\n// Launch with stealth args (add to browser if needed, but headers often suffice)\nconst browser = await $puppeteer.launch({ \n  headless: true, \n  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'] \n});\nconst page = await browser.newPage();\nawait page.goto(targetUrl, { waitUntil: 'networkidle0', timeout: 45000 });\n\n// Longer delay + wait for specific YouTube load signal\nawait new Promise(resolve => setTimeout(resolve, 5000));\nawait page.waitForSelector('[id=\"content\"]', { timeout: 10000 });  // Wait for main content container\n\n// Enhanced extraction: Multiple selectors for video title (YouTube-proof)\nconst videoTitle = await page.evaluate(() => {\n  // Primary selector (current YouTube)\n  let titleEl = document.querySelector('h1.ytd-video-primary-info-renderer');\n  if (!titleEl) titleEl = document.querySelector('h1.title.style-scope.ytd-video-primary-info-renderer');\n  if (!titleEl) titleEl = document.querySelector('#container h1.title');\n  if (!titleEl) titleEl = document.querySelector('yt-formatted-string.ytd-video-primary-info-renderer');\n  return titleEl ? titleEl.innerText.trim() : null;\n});\n\n// Fallback: Document title (always there)\nconst pageTitle = await page.evaluate(() => document.title);\n\n// Close browser\nawait browser.close();\n\n// Final pick\nconst extractedTitle = videoTitle || pageTitle || 'Extraction failed - page loaded but no title found';\n\n// Debug logs (visible in n8n execution data or browser console)\nconsole.log('Video Title Attempt:', videoTitle);\nconsole.log('Page Title Fallback:', pageTitle);\nconsole.log('Final Extracted:', extractedTitle);\n\n// Output\nreturn [{\n  json: {\n    title: extractedTitle,\n    videoTitle: videoTitle,\n    pageTitle: pageTitle\n  }\n}];",
+        "options": {}
+      },
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [
+        -2112,
+        -928
+      ],
+      "id": "ca88dd83-7aa5-400d-854e-96faac7c1d49",
+      "name": "Puppeteer"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferLast"
+            }
+          },
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1600,
+        -880
+      ],
+      "id": "c1bb9783-663c-4f76-a7f4-f533640a72cb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7bf00a7-0493-4595-b760-9177992938c9",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "599a5a0f-fa75-43f2-b4c1-9f30254a14d6",
+              "name": "pageContent",
+              "value": "={{ { \"body\": $json.pageContent ? $json.pageContent.body : '' } }}",
+              "type": "object"
+            },
+            {
+              "id": "dc59f216-54c5-4afe-9a66-7ae327ee0140",
+              "name": "extractedUrl",
+              "value": "={{ $json.extractedUrl || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "bb809519-c576-4b15-918f-858deb4a2562",
+              "name": "startTime",
+              "value": "={{ $json.startTime || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1616,
+        -624
+      ],
+      "id": "990c5168-c4a4-404d-8897-bb45af8a67d0",
+      "name": "final"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Set Chat Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Puppeteer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Set Chat Input": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Puppeteer": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "final": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cda27082-44fb-437e-a3ce-3635aa76eea4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "ZL4vy6uCBdRsOyNn",
+  "tags": []
+}

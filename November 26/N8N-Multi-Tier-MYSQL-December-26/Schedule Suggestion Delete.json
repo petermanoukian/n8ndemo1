@@ -1,0 +1,73 @@
+{
+  "name": "Schedule Suggestion Delete",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d29220d4-9d41-4de8-b7c9-038eca185789",
+      "name": "Schedule Suggestion Delete"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WdbjLF50L2R0bIzv",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WdbjLF50L2R0bIzv",
+          "cachedResultName": "Delete Loop Suggestions Delete Sheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8002f0b0-51e0-4296-af7e-b56f9e6e8692",
+      "name": "Delete Loop Suggestions Delete Sheet"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Suggestion Delete": {
+      "main": [
+        [
+          {
+            "node": "Delete Loop Suggestions Delete Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "20857415-3de7-400b-a998-bc265674e541",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "Ppor6JjnUY7dojC1",
+  "tags": []
+}

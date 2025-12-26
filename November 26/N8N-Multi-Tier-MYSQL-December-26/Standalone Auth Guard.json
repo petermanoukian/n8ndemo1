@@ -1,0 +1,350 @@
+{
+  "name": "Standalone Auth Guard",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth-guard",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        -128
+      ],
+      "id": "1e93f539-d416-4ebe-adb9-7556eda6ae58",
+      "name": "Webhook",
+      "webhookId": "cec8d90c-f9d9-40f8-b9db-b6b7aea09d5e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbf06720-82a4-4b0b-89c2-d11315d9851a",
+              "leftValue": "={{ Number($json.isauthenticatedbysanctumfirstcheck) }}",
+              "rightValue": "414",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        -288
+      ],
+      "id": "c73bf360-30ee-44bf-8f5b-05f615d732f9",
+      "name": "If Logged in"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmcZeAoJSPeCoNx",
+          "mode": "list",
+          "cachedResultName": "secrettable",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblmcZeAoJSPeCoNx"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $json.MyIP }}\"\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -528
+      ],
+      "id": "70cce804-85c8-4d56-b796-ca4591dd0093",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -176
+      ],
+      "id": "e0896762-752c-4657-b8df-4d5d45bf2f55",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -160
+      ],
+      "id": "0201f7c4-01a5-464e-b45c-eeb2d4fe71bc",
+      "name": "Datatabel Central Settings"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Redirecting...</title>\n\n  <meta http-equiv=\"refresh\" content=\"3; url={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/73c72dd0-6e4a-414e-9ad8-cf9524371a11\">\n</head>\n<body style=\"font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f8ff;\">\n  <h2>We wil take you to the login page now</h2>\n  <p>Now we wil go to the login form in a moment...</p>\n<p>The link is: \n\n<a href = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/73c72dd0-6e4a-414e-9ad8-cf9524371a11' target ='_blank'> \n\n&raquo; Laravel Login </a> </p>\n  <p id=\"status\" style=\"color: #666;\">If it doesn't open, you'll be redirected shortly.</p>\n  \n  <script>\n    (function() {\n      const formUrl = '{{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/form/73c72dd0-6e4a-414e-9ad8-cf9524371a11';\n      \n      // Try to open in new window immediately (most browsers allow in response context)\n      const newWindow = window.open(formUrl, '_blank', 'width=600,height=700,scrollbars=yes,resizable=yes');\n      \n      if (newWindow) {\n        // Success: Update status and close this tab after delay\n        document.getElementById('status').textContent = 'Form opened in new window! Closing this page...';\n        setTimeout(() => { window.close(); }, 2000);\n      } else {\n        // Blocked: Rely on meta redirect (current tab jumps to form)\n        document.getElementById('status').textContent = 'Popup blocked—redirecting to form now.';\n      }\n    })();\n  </script>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1056,
+        -80
+      ],
+      "id": "a284e8c5-babc-496b-8a39-46e3bdfce95c",
+      "name": "redirect to login"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API }}/check-auth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" +$json.token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        -224
+      ],
+      "id": "792eedb2-884a-4435-8d91-2c1c36cdc0e9",
+      "name": "check authenthcation",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        -544
+      ],
+      "id": "b77ecb10-26e4-46f4-b2ab-514425110f77",
+      "name": "Merge",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"not_logged_in\",\n  \"message\": \"Not Logegd In\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        848,
+        -160
+      ],
+      "id": "7601db97-d7f9-4fe2-bb9b-ced2509eab24",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"logged_in\",\n  \"message\": \"Dashboard ready, welcome\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        848,
+        -432
+      ],
+      "id": "690d9529-38e5-4e0e-b932-328661d0190a",
+      "name": "Loggedin"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM secrettable WHERE ipaddress = '{{ $json.MyIP }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        80,
+        -176
+      ],
+      "id": "379f408c-f043-4f45-925a-96b78d4693b6",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "2lKug6PdOc5btt3K",
+          "name": "Central N8N Database"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If Logged in": {
+      "main": [
+        [
+          {
+            "node": "Loggedin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Token By IP Address": {
+      "main": [
+        []
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatabel Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check authenthcation": {
+      "main": [
+        [
+          {
+            "node": "If Logged in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Datatabel Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redirect to login": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "redirect to login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "check authenthcation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3fbebaa2-4edb-47fc-a9ae-32b22fe343bf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "90NdkOtCKyAHK1To",
+  "tags": []
+}
