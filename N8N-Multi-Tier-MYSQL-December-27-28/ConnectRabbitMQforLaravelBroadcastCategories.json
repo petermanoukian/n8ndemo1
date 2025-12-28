@@ -1,0 +1,183 @@
+{
+  "name": "ConnectRabbitMQforLaravelBroadcastCategories",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -80
+      ],
+      "id": "890b9ec6-b013-45ea-907d-a0f43cc9d339",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "UkIF8mFcb2AApRP3",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/UkIF8mFcb2AApRP3",
+          "cachedResultName": "Triggered Standalone Auth Guard Event MN version"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -352,
+        -80
+      ],
+      "id": "09441929-aa85-481c-ae4e-cecf565105b2",
+      "name": "Call 'Triggered Standalone Auth Guard Event MN version'"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bee7e714-0c68-416f-bf39-f5308464ba91",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "loggedok",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e736b646-3466-4e57-826a-d9d87c2b6b43",
+              "leftValue": "={{ $json.token }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3242686c-e763-47ba-8c5a-8548ba7a0b78",
+              "leftValue": "={{ $json.user_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a20672ef-e752-4ef8-b218-72f96737d80a",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        -192
+      ],
+      "id": "6ddef2f1-e49b-4634-b735-d20947efbb59",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "xGAsFIy8re8eCj9N",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/xGAsFIy8re8eCj9N",
+          "cachedResultName": "RabbitMQCatsCosumer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -240
+      ],
+      "id": "487ebc36-3144-4f41-9d1d-4ed8d0c1f1dd",
+      "name": "Call 'RabbitMQCatsCosumer'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Call 'Triggered Standalone Auth Guard Event MN version'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Triggered Standalone Auth Guard Event MN version'": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Call 'RabbitMQCatsCosumer'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "60112d53-6307-4416-9700-f939799c7946",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "FprkaZpXx2QVLnSz",
+  "tags": [
+    {
+      "updatedAt": "2025-12-25T11:27:54.249Z",
+      "createdAt": "2025-12-25T11:27:54.249Z",
+      "id": "Qf1ianxVuv1kf6Vs",
+      "name": "RabbitMQ4BroadcastCats"
+    }
+  ]
+}

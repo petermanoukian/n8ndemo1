@@ -1,0 +1,75 @@
+{
+  "name": "Schedule Insert Suggestion google Sheets 1-2",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 40
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "ebbab963-7c94-4797-b066-663760f0fe83",
+      "name": "Knowledge Base Suggestion google Sheets Shcedule",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Q7nsgfXPbip9NXyn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Q7nsgfXPbip9NXyn",
+          "cachedResultName": "Insert OnDailyBasis Knowledge Base Suggestion - sheet 1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        -160
+      ],
+      "id": "2ac836b2-90f2-4119-9fad-a2a6c731698a",
+      "name": "Read Knowledge Base OnDailyBasis"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Knowledge Base Suggestion google Sheets Shcedule": {
+      "main": [
+        [
+          {
+            "node": "Read Knowledge Base OnDailyBasis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "884ab70a-e458-4aa6-abd3-bc165d63be66",
+  "meta": {
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "OEqA8WDkuDhgqYwD",
+  "tags": []
+}

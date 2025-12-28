@@ -1,0 +1,1539 @@
+{
+  "name": "Retrieve insert categories",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JZVjEJheLGlDnNz4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/JZVjEJheLGlDnNz4",
+          "cachedResultName": "Centralized Database Settings"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -640,
+        -448
+      ],
+      "id": "1d67c59c-5126-4fdd-9b6f-4cc520addce5",
+      "name": "Call 'Centralized Database Settings'",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo",
+          "mode": "list",
+          "cachedResultName": "N8N Categories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Main",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id }}",
+            "Name": "={{ $json.name }}",
+            "Department": "={{ $json.department }}",
+            "Image": "={{ $json.img }}",
+            "File": "={{ $json.filer }}",
+            "Date Created": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        -480
+      ],
+      "id": "965b5c29-2e38-45ef-926b-98729b966f34",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ba65d29e-2a3b-49bd-822f-f10e9cd98c64",
+              "name": "id",
+              "value": "={{ $('Insert-Read-First-Webhook').item.json.body.id }}",
+              "type": "string"
+            },
+            {
+              "id": "64bd5d80-5409-4ad5-954f-92bcec38d6ef",
+              "name": "name",
+              "value": "={{ $('Insert-Read-First-Webhook').item.json.body.name }}\n",
+              "type": "string"
+            },
+            {
+              "id": "b6123014-e18b-4e7a-aca4-b7bb6e7903bd",
+              "name": "department",
+              "value": "={{ $('Insert-Read-First-Webhook').item.json.body.department }}",
+              "type": "string"
+            },
+            {
+              "id": "ff4a4a30-76c5-414b-8314-0d2055b339a4",
+              "name": "img",
+              "value": "={{ $('Insert-Read-First-Webhook').item.json.body.img }}",
+              "type": "string"
+            },
+            {
+              "id": "16c6636f-4380-47d2-bf86-bfe6a02ecb34",
+              "name": "filer",
+              "value": "={{ $('Insert-Read-First-Webhook').item.json.body.filer }}",
+              "type": "string"
+            },
+            {
+              "id": "44469cb7-0410-4dc8-9b09-c333db3819ab",
+              "name": "created_at",
+              "value": "={{ $('Insert-Read-First-Webhook').item.json.body.created_at}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -480
+      ],
+      "id": "47e4c488-7ecc-4b29-a737-b3b7145e21d7",
+      "name": "Cat"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Department }}",
+                    "rightValue": "Sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c28616f1-8bfd-4f8a-8b6b-9f45076da897"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sales"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "be302401-a7ce-415d-888a-373e165884ae",
+                    "leftValue": "={{ $json.Department }}",
+                    "rightValue": "Marketing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Marketing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "172ffc9b-8409-4d9f-b345-8ab63c5da349",
+                    "leftValue": "={{ $json.Department }}",
+                    "rightValue": "PR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2fae2511-f24f-40e2-91e0-426f23546103",
+                    "leftValue": "={{ $json.Department }}",
+                    "rightValue": "HR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "HR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "979eefc6-c89f-4819-ac28-7ce211614dd6",
+                    "leftValue": "={{ $json.Department }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Blank"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1008,
+        -160
+      ],
+      "id": "9fe7f433-92f0-4fda-b367-b5dd9442ec21",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo",
+          "mode": "list",
+          "cachedResultName": "N8N Categories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1640050947,
+          "mode": "list",
+          "cachedResultName": "Sales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit#gid=1640050947"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.ID }}",
+            "Name": "={{ $json.Name }}",
+            "Department": "={{ $json.Department }}",
+            "Image": "={{ $json.Image }}",
+            "File": "={{ $json.File }}",
+            "Date Created": "={{ $json['Date Created'] }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -576,
+        -256
+      ],
+      "id": "af0c6f02-288f-4bce-973c-7dff40e9371b",
+      "name": "Sales",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo",
+          "mode": "list",
+          "cachedResultName": "N8N Categories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 217360960,
+          "mode": "list",
+          "cachedResultName": "Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit#gid=217360960"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.ID }}",
+            "Name": "={{ $json.Name }}",
+            "Department": "={{ $json.Department }}",
+            "Image": "={{ $json.Image }}",
+            "File": "={{ $json.File }}",
+            "Date Created": "={{ $json['Date Created'] }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -736,
+        -160
+      ],
+      "id": "218da383-8df0-4a3b-8a1e-a6846d38aab4",
+      "name": "marketing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo",
+          "mode": "list",
+          "cachedResultName": "N8N Categories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 266103519,
+          "mode": "list",
+          "cachedResultName": "PR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit#gid=266103519"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.ID }}",
+            "Name": "={{ $json.Name }}",
+            "Department": "={{ $json.Department }}",
+            "Image": "={{ $json.Image }}",
+            "File": "={{ $json.File }}",
+            "Date Created": "={{ $json['Date Created'] }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -512,
+        -96
+      ],
+      "id": "e830e882-64ae-43dc-9e27-7fd02a64b55c",
+      "name": "PR",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo",
+          "mode": "list",
+          "cachedResultName": "N8N Categories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 229883588,
+          "mode": "list",
+          "cachedResultName": "HR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit#gid=229883588"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.ID }}",
+            "Name": "={{ $json.Name }}",
+            "Department": "={{ $json.Department }}",
+            "Image": "={{ $json.Image }}",
+            "File": "={{ $json.File }}",
+            "Date Created": "={{ $json['Date Created'] }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        32
+      ],
+      "id": "ed404e70-1851-4942-9daa-89241e0d3887",
+      "name": "HR",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo",
+          "mode": "list",
+          "cachedResultName": "N8N Categories",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 346094923,
+          "mode": "list",
+          "cachedResultName": "Blank",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mTw1eTxS2xgpZsUPRj2qoUXixqIBL3RGHakLIZJsiFo/edit#gid=346094923"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.ID }}",
+            "Name": "={{ $json.Name }}",
+            "Image": "={{ $json.Image }}",
+            "File": "={{ $json.File }}",
+            "Date Created": "={{ $json['Date Created'] }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "File",
+              "displayName": "File",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -320,
+        208
+      ],
+      "id": "94b40aee-c36f-4997-9c30-0a8d2623001a",
+      "name": "BLANK",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "={{ $json.Department }} new category",
+        "message": "={{ $json.Name }} was added to {{ $json.Department }}\n{{ $json.Image }}\n{{ $json.File }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        -16
+      ],
+      "id": "ce0c4715-0cc2-4a7b-a6c8-3ba47177c409",
+      "name": "PR message",
+      "webhookId": "1d6c5aeb-c106-405b-86c5-af3cd4602469",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "={{ $json.Department }}",
+        "message": "=category added :  {{ $json.Name }} \nto DeDepartment {{ $json.Department }} \n{{ $json.Image }}\n{{ $json.File }}\nOn: {{ $json['Date Created'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        96
+      ],
+      "id": "6725b977-37e6-48da-a8ba-850414c0a9b9",
+      "name": "HR Message",
+      "webhookId": "61f58533-e46b-4623-97dd-92df8d7301aa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "insert-read-first-cat",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -880,
+        -448
+      ],
+      "id": "4ec0b764-e9d7-4115-8c4e-342b6e28a803",
+      "name": "Insert-Read-First-Webhook",
+      "webhookId": "ac3112ed-ff04-4600-a533-12b716624f30",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "={{ $json.Department }} New Record",
+        "message": "={{ $json.Name }} is added to {{ $json.Department }}\n{{ $json.Image }}\n{{ $json.File }}",
+        "options": {
+          "ccList": "={{ $json.Department }}N8n@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        -288
+      ],
+      "id": "c13d0857-c69c-43fa-b30e-029519b785b3",
+      "name": "Sales Message",
+      "webhookId": "b1ae46de-c99b-4ded-a60a-6b93b34bd8f9",
+      "notesInFlow": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": "sending emial to sales"
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "={{ $json.Department }}",
+        "message": "={{ $json.Name }} was added to Department {{ $json.Department }}\nimage : {{ $json.Image }}\nFile: {{ $json.File }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        -160
+      ],
+      "id": "bb0a7044-f996-43ac-a907-31a0059cdc88",
+      "name": "Marketing Message",
+      "webhookId": "4930f282-eaae-41b2-ac45-f096c85451e5",
+      "notesInFlow": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed29eb66-54f2-49c3-a10b-66443e318cdc",
+              "name": "id",
+              "value": "={{ $('Cat').item.json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "3132c9f5-146c-4911-b7d0-5ea605fc91ea",
+              "name": "name",
+              "value": "={{ $('Cat').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "6a1c6336-74c0-4f5f-ae97-63a285debe28",
+              "name": "department",
+              "value": "={{ $('Cat').item.json.department }}",
+              "type": "string"
+            },
+            {
+              "id": "c1cd0f97-0ac2-49fb-b833-0b1b57d1033a",
+              "name": "img",
+              "value": "={{ $('Cat').item.json.img }}",
+              "type": "string"
+            },
+            {
+              "id": "c0f047a4-c46c-472a-bebb-f1dd39d9dea6",
+              "name": "filer",
+              "value": "={{ $('Cat').item.json.filer }}",
+              "type": "string"
+            },
+            {
+              "id": "c213f139-c050-4355-ae9b-95c9e3a8c2cb",
+              "name": "created_at",
+              "value": "={{ $('Cat').item.json.created_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -192
+      ],
+      "id": "e0da76e4-44a9-4c49-8780-505aedaacbb9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblC9a6wfOQoohvGF",
+          "mode": "list",
+          "cachedResultName": "category",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblC9a6wfOQoohvGF"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "department": "={{ $json.department }}",
+            "img": "={{ $json.img }}",
+            "filer": "={{ $json.filer }}",
+            "Created Date": "={{ $json.created_at }}",
+            "mysqlid": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "mysqlid"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "mysqlid",
+              "displayName": "mysqlid",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "img",
+              "displayName": "img",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "filer",
+              "displayName": "filer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created Date",
+              "displayName": "Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        -496
+      ],
+      "id": "a4a1a21e-a625-4357-94c9-c99dc4b64752",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "hGtCP0gu8PfKi19j",
+          "mode": "list",
+          "cachedResultName": "category",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/hGtCP0gu8PfKi19j"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "mysqlid",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mysqlid": "={{ $json.id }}",
+            "name": "={{ $json.name }}",
+            "department": "={{ $json.department }}",
+            "img": "={{ $json.img }}",
+            "filer": "={{ $json.filer }}",
+            "created_at": "={{ $json.created_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "mysqlid",
+              "displayName": "mysqlid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "img",
+              "displayName": "img",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "filer",
+              "displayName": "filer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        272,
+        0
+      ],
+      "id": "25b1141e-68d9-47ec-827e-8610458d2fe8",
+      "name": "Upsert row(s)"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO category (\n  mysqlid,\n  name,\n  department,\n  img,\n  filer,\n  `Created Date`\n)\nVALUES (\n  {{ $json.id }},\n  '{{ $json.name }}',\n  '{{ $json.department }}',\n  '{{ $json.img }}',\n  '{{ $json.filer }}',\n  '{{ $json.created_at }}'\n)\nON DUPLICATE KEY UPDATE\n  name = VALUES(name),\n  department = VALUES(department),\n  img = VALUES(img),\n  filer = VALUES(filer),\n  `Created Date` = VALUES(`Created Date`)",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        176,
+        -320
+      ],
+      "id": "6c1a34a4-4073-4485-a41c-6a3dedca2bf5",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "2lKug6PdOc5btt3K",
+          "name": "Central N8N Database"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Insert-Read-First-Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "content-type": "application/json",
+            "user-agent": "axios/1.12.0",
+            "content-length": "284",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "localhost:5678",
+            "connection": "close"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": 184,
+            "name": "November 21 full 2",
+            "department": "PR",
+            "img": "http://localhost:8000/uploads/img/cat/November-21-full-2-1763723063_6920473740249.jpg",
+            "filer": "http://localhost:8000/uploads/files/cat/November-21-full-2_1763723063_692047375d3f8.docx",
+            "created_at": "2025-11-21T11:04:23"
+          },
+          "webhookUrl": "http://localhost:5678/webhook/insert-read-first-cat",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Call 'Centralized Database Settings'": {
+      "main": [
+        [
+          {
+            "node": "Cat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Cat": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Sales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "marketing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BLANK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales": {
+      "main": [
+        [
+          {
+            "node": "Sales Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "marketing": {
+      "main": [
+        [
+          {
+            "node": "Marketing Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR": {
+      "main": [
+        [
+          {
+            "node": "PR message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR": {
+      "main": [
+        [
+          {
+            "node": "HR Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert-Read-First-Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call 'Centralized Database Settings'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR Message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BLANK": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert row(s)": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4be7e7fb-a773-47f7-a1dd-140a32e5245c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "pMzT08jOvRRTQeup",
+  "tags": []
+}

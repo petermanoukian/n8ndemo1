@@ -1,0 +1,315 @@
+{
+  "name": "Insert OnDailyBasis Suggestion - sheets 1-2",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -32
+      ],
+      "id": "44bf2467-dd3e-48db-8cc3-f429dbd44cdb",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY",
+          "mode": "list",
+          "cachedResultName": "Knowledge Base Suggestions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2053892943,
+          "mode": "list",
+          "cachedResultName": "Daily List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_qDXH9iyfUQUI7Dj_UBM-yU7xyVOuWLWSBcgw3ArrNY/edit#gid=2053892943"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -336,
+        -32
+      ],
+      "id": "23bdea0d-c52d-4301-a678-27056bf2bc82",
+      "name": "Daily Read Knowldge Base",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'totalCount' to each group\nconst rows = items.map(item => item.json);\nconst totalCount = rows.length;\n\nconst grouped = rows.reduce((acc, row) => {\n  const key = row.KnowledgeBase || 'Unknown';\n  acc[key] = acc[key] || [];\n  acc[key].push(row);\n  return acc;\n}, {});\n\nreturn Object.entries(grouped).map(([key, group]) => ({\n  json: {\n    groupKey: key,\n    records: group,\n    totalCount   // total number of rows across all groups\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -64
+      ],
+      "id": "ff96c9fc-7c28-448c-9f00-eb77ef18e2f1",
+      "name": "Retrieve Google Sheet Records"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wRyw7DyTlioKKc5i",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wRyw7DyTlioKKc5i",
+          "cachedResultName": "Logged In Guard Middleware Extended"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        -112
+      ],
+      "id": "f4c8f948-a25d-4659-9c03-7d863494b051",
+      "name": "Call 'Logged In Guard Middleware Extended'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Sheets Items and The Main Settings').item.json.LARAVEL_BACKEND_MCP }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" + $('Sheets Items and The Main Settings').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"manage-baser-suggestions\",\n    \"arguments\": {\n      \"action\": \"create\",\n      \"baser_id\":\"{{ $json.baser_id }}\",\n      \"SuggestionID\": \"{{ $json.SuggestionID }}\",\n      \"KnowledgeBase\": \"{{ $json.KnowledgeBase }}\",\n      \"Suggestion\": \"{{ $json.Suggestion }}\",\n      \"Details\": \"{{ $json.Details }}\"\n    }\n  },\n  \"id\": {{ Math.floor(Math.random() * 1000) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        848,
+        -320
+      ],
+      "id": "47b57421-adba-4ac8-a374-c2e514e0c730",
+      "name": "HTTP Request to categories FilterPrompt prperation",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae8b5909-8993-4ccb-ad44-ba0bfa244ae0",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "5dc20846-1241-4cc8-8559-999f2d743f59",
+              "name": "LARAVEL_BACKEND_MCP",
+              "value": "={{ $json.LARAVEL_BACKEND_MCP }}",
+              "type": "string"
+            },
+            {
+              "id": "03ba135e-07db-4b18-bc48-9b077ff723b4",
+              "name": "records",
+              "value": "={{ $('Flatten').item.json.records }}",
+              "type": "array"
+            },
+            {
+              "id": "349e390b-5c88-4278-91ba-81421b73ab9b",
+              "name": "totalCount",
+              "value": "={{ $('Flatten').item.json.totalCount }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        -384
+      ],
+      "id": "79b70eb7-0813-46e8-9326-0c7bfa60b571",
+      "name": "Sheets Items and The Main Settings",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all incoming items into one array\nconst allRecords = [];\n\nfor (const item of items) {\n  if (item.json.records) {\n    allRecords.push(...item.json.records);\n  } else {\n    allRecords.push(item.json);\n  }\n}\n\nreturn [\n  {\n    json: {\n      records: allRecords,\n      totalCount: allRecords.length\n    }\n  }\n];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -64
+      ],
+      "id": "295b5bd8-6e31-41f9-9978-622367a7f8a8",
+      "name": "Flatten"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- FINAL MINIMIZED CODE NODE PAYLOAD ---\n// 1. Get the JSON object from the first (and only) incoming item.\nconst inputData = items[0].json;\n// 2. Extract the 'records' array from the input.\nconst recordsToSplit = inputData.records || [];\n// 3. Create a new N8N output item for every record found, selecting only necessary fields.\nconst outputItems = recordsToSplit\n  .filter(record => record.SuggestionID)  // NEW: Skip if SuggestionID falsy/empty\n  .map(record => {\n \n    // --- CLEANUP STEP: Trim whitespace (fixes the JSON validation issue) ---\n    const cleanedKnowledgeBase = (record.KnowledgeBase && typeof record.KnowledgeBase === 'string')\n      ? record.KnowledgeBase.trim()\n      : record.KnowledgeBase;\n   \n    // --- PAYLOAD CONSTRUCTION: Explicitly select ONLY the core data fields ---\n    const minimizedPayload = {\n      \"KnowledgeBase\": cleanedKnowledgeBase,\n      \"baser_id\": record.knowledgebaseid,\n      \"SuggestionID\": record.SuggestionID,\n      \"Suggestion\": record.Suggestion,\n      \"Details\": record.Details,\n    };\n   \n    // The N8N Code node returns an array of { json: <payload> } objects.\n    return {\n      json: minimizedPayload\n    };\n  });\n// Return the array of new items (only valid ones).\nreturn outputItems;\n// ----------------------------------------------------------------"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -432
+      ],
+      "id": "17f47118-3968-4f5a-9e2b-a2cbae835609",
+      "name": "Split and send final parmaters"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Nu8TWyTPttmJptc9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Nu8TWyTPttmJptc9",
+          "cachedResultName": "InsertSheet-Insert Suggestion - Sheet 2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        -320
+      ],
+      "id": "3a4160b8-b3e3-4657-b2b4-0cb98cfff030",
+      "name": "InsertSheet-Read Knowledge Base OnDailyBasis",
+      "executeOnce": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Daily Read Knowldge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Read Knowldge Base": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Google Sheet Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Google Sheet Records": {
+      "main": [
+        [
+          {
+            "node": "Flatten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Logged In Guard Middleware Extended'": {
+      "main": [
+        [
+          {
+            "node": "Sheets Items and The Main Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets Items and The Main Settings": {
+      "main": [
+        [
+          {
+            "node": "Split and send final parmaters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten": {
+      "main": [
+        [
+          {
+            "node": "Call 'Logged In Guard Middleware Extended'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split and send final parmaters": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to categories FilterPrompt prperation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to categories FilterPrompt prperation": {
+      "main": [
+        [
+          {
+            "node": "InsertSheet-Read Knowledge Base OnDailyBasis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3bebe077-ca78-4f32-bedc-a231a3603ca0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "Q7nsgfXPbip9NXyn",
+  "tags": []
+}
