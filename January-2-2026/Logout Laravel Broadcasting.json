@@ -1,0 +1,402 @@
+{
+  "name": "Logout Laravel Broadcasting",
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "logoutbroadcast",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        -112
+      ],
+      "id": "c62e5836-f802-40eb-a5bb-22b7f505f178",
+      "name": "Webhook",
+      "webhookId": "9079ee93-a51a-416b-9738-84409b019c5b",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        -80
+      ],
+      "id": "4c26a6f8-a4cf-4b3c-bda2-403027ca0424",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        -144
+      ],
+      "id": "0db6f3c7-e36d-4114-b895-008d3dbab634",
+      "name": "Datatable Central Settings"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.N8N_FRONTEND }}/webhook/guard-EventMN-Version",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -400,
+        -208
+      ],
+      "id": "860eeb21-2587-4494-ad5a-248f40755d22",
+      "name": "Call the Middleware"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dbf4d909-6c3f-447c-9bf9-e1f112bef9ad",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "logged_in",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        -160
+      ],
+      "id": "93485407-d91b-4ab9-a1eb-9266397a74d1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Retrieve central settings').item.json.LARAVEL_BACKEND_API2 }}/logout",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ \"Bearer \" +$json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        304,
+        -144
+      ],
+      "id": "70f486a1-c1a7-444b-9977-6afd02c1b88a",
+      "name": "HTTP Request",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $('Retrieve central settings').item.json.MyIP2 }}\"\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -448
+      ],
+      "id": "faba0a21-37de-43ff-acd4-4834f872c0d4",
+      "name": "Retrieve Token By IP Address",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "id": "={{ $('Retrieve Token By IP Address').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        -384
+      ],
+      "id": "9472a7fe-1fc0-48fb-a582-07f02cffb72d",
+      "name": "Delete a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "redirect",
+        "redirectURL": "={{ $('Retrieve central settings').item.json.N8N_FRONTEND }}/webhook/broadcastingentry",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        880,
+        -160
+      ],
+      "id": "e31c979f-4adf-48bc-b8c5-1a66c51b43c6",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM secrettable2 WHERE ipaddress = '{{ $('Retrieve central settings').item.json.MyIP2 }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        112,
+        -160
+      ],
+      "id": "7f57f662-4fdd-4ca9-a8bc-3379c44b542f",
+      "name": "retrieve mysql",
+      "credentials": {
+        "mySql": {
+          "id": "2lKug6PdOc5btt3K",
+          "name": "Central N8N Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete FROM secrettable2 WHERE id = '{{ $('retrieve mysql').item.json.id }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        576,
+        -176
+      ],
+      "id": "a75e7812-75b1-4de4-b52d-d18ddc95d794",
+      "name": "delete",
+      "credentials": {
+        "mySql": {
+          "id": "2lKug6PdOc5btt3K",
+          "name": "Central N8N Database"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Datatable Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Call the Middleware",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatable Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call the Middleware": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "retrieve mysql",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Token By IP Address": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "delete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a record": {
+      "main": [
+        []
+      ]
+    },
+    "retrieve mysql": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e0ed5d7d-b56d-4640-a795-ab3567c93929",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "yj95IYLOntnB1Ql9",
+  "tags": [
+    {
+      "updatedAt": "2025-12-21T17:06:58.284Z",
+      "createdAt": "2025-12-21T17:06:58.284Z",
+      "id": "GzBA7S4u1pABHh3Q",
+      "name": "logout"
+    },
+    {
+      "updatedAt": "2025-12-21T17:07:07.913Z",
+      "createdAt": "2025-12-21T17:07:07.913Z",
+      "id": "sTMKemFQ0feQvNax",
+      "name": "logoutbroadcasting"
+    }
+  ]
+}

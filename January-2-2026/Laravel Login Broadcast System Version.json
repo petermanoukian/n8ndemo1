@@ -1,0 +1,578 @@
+{
+  "name": "Laravel Login Broadcast System Version",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "login To laravel Multi Event System",
+        "formDescription": "login first step to Multi Event System Broacast Sign In Page",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "placeholder": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "password",
+              "fieldType": "password",
+              "placeholder": "Password",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "remember",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Remember Me"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "appendAttribution": false,
+          "respondWithOptions": {
+            "values": {
+              "respondWith": "=redirect",
+              "redirectUrl": "=http://localhost:5678/webhook/eventmanagemtnadmin"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -2256,
+        16
+      ],
+      "id": "0478ceac-372b-481d-a6a8-40bada155317",
+      "name": "Laravel LoginForm UI",
+      "webhookId": "f9a064a6-60e2-4261-bd48-5151c18dccbb",
+      "notesInFlow": true,
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput",
+      "notes": "Here is the node"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nwlYnH8lbFWbGriq",
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "/projects/cq8LPFRw7xIWBu7h/datatables/nwlYnH8lbFWbGriq"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        -32
+      ],
+      "id": "de0ba71e-cefa-4161-94f6-8b227c135d77",
+      "name": "Datatabel Central Settings"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all input items (each record)\nconst items = $input.all();\nconst settings = {};\n\n// Loop through them and map key → value\nfor (const item of items) {\n  const row = item.json;\n  settings[row.key] = row.value;\n}\n\n// Optionally store globally for later nodes\n$vars.settings = settings;\n\n// Return as output\nreturn [{ json: settings }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1616,
+        -272
+      ],
+      "id": "701825fc-5327-45fe-9b53-51a4eaaba981",
+      "name": "Retrieve central settings"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76373d11-3fd2-431b-be6b-14a290916cee",
+              "name": "emailpassed",
+              "value": "={{ $('Laravel LoginForm UI').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "3f680720-8060-481a-baf0-f7ea9a43eb52",
+              "name": "passwordpassed",
+              "value": "={{ $('Laravel LoginForm UI').item.json.password }}",
+              "type": "string"
+            },
+            {
+              "id": "d9633236-b22e-4b9b-8120-94d5b3a69e05",
+              "name": "rememberpassed",
+              "value": "={{ $('Laravel LoginForm UI').item.json.remember > 0 ? true : false }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1920,
+        -272
+      ],
+      "id": "d339c547-5ed0-4bf9-836a-f603aef357ed",
+      "name": "LognFormValues",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c671ea7-981f-467b-a249-58af52b1133b",
+              "leftValue": "={{ $json.token }}",
+              "rightValue": "=\"true\"",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1168,
+        -224
+      ],
+      "id": "0233a241-ae4b-4639-b6a4-adbdf7c68d42",
+      "name": "IF Token Present",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "41894c99-2d4a-493b-8434-851d1f4e943c",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "74c4cdc5-65f2-4a1f-a0c7-5b46fe815e67",
+              "name": "ip",
+              "value": "={{ $json.ip }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        -480
+      ],
+      "id": "ccc2b9bb-406f-4f26-940e-9de14ef10187",
+      "name": "Send Token and IP",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "bediktest@gmail.com",
+        "subject": "failed Login attempt",
+        "message": "=failed Login Attempt From : {{ $('LognFormValues').first().json.emailpassed }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        48
+      ],
+      "id": "c30fba81-f3b4-4e96-a441-df2d7e3bc68b",
+      "name": "Send Failure Notification",
+      "webhookId": "cf142a87-c96b-47c5-aace-86cdd9e4536e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ozKOoFfLTOy5P7d",
+          "name": "Google-N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appSRKIfx8ndL0Qtx",
+          "mode": "list",
+          "cachedResultName": "N8N Chat Scraper",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAWrKygkDwyq1XB",
+          "mode": "list",
+          "cachedResultName": "secrettable2",
+          "cachedResultUrl": "https://airtable.com/appSRKIfx8ndL0Qtx/tblAWrKygkDwyq1XB"
+        },
+        "filterByFormula": "=ipaddress = \"{{ $json.ip }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -2368,
+        -464
+      ],
+      "id": "ff2bc0fe-fc66-48e7-8847-658bf5e2f355",
+      "name": "Check IP Address",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "b4bdqV7yCwNwcBgT",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.LARAVEL_BACKEND_API2 }}/login",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $('LognFormValues').first().json.emailpassed }}"
+            },
+            {
+              "name": "password",
+              "value": "={{ $('LognFormValues').first().json.passwordpassed }}"
+            },
+            {
+              "name": "remember",
+              "value": "={{ $('LognFormValues').first().json.remember ? true : false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1360,
+        -320
+      ],
+      "id": "9a95eaf8-5e55-451b-8512-81963d7042cc",
+      "name": "Send HTTP Request to Laravel Backend"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Custom failure message\nconst message = `\n  <h2>Login Failed</h2>\n  <p>Email notification sent. Please try again with correct credentials.</p>\n  <a href=\"#\" onclick=\"history.back()\">Go Back to Form</a>\n`;\n\n// Return response object for Form Trigger\nreturn {\n  response: {\n    status: 200,\n    headers: {\n      'Content-Type': 'text/html'\n    },\n    body: message\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -944,
+        320
+      ],
+      "id": "3cd82a1d-7b3c-4501-a1f0-5107ef723d11",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0",
+          "mode": "list",
+          "cachedResultName": "Login Activity",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 98062569,
+          "mode": "list",
+          "cachedResultName": "Failed Login",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BSESgSV1qTyyR8xFg8kT5RodvrsRbb3ZqyBYKtXj0j0/edit#gid=98062569"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('LognFormValues').first().json.emailpassed }}",
+            "DaetTime": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DaetTime",
+              "displayName": "DaetTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1424,
+        256
+      ],
+      "id": "5f087785-9da8-4a88-90ec-ec461585ab3d",
+      "name": "Failure Insertion",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "emOxEV9cfdMjtjeF",
+          "name": "Google Sheets N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5H50Ky663XXQZe2C",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/5H50Ky663XXQZe2C",
+          "cachedResultName": "Laravel token Sub Flow New Version"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "token": "={{ $('Send Token and IP').item.json.token }}",
+            "ip": "={{ $('Send Token and IP').item.json.ip }}",
+            "email": "={{ $('Send Token and IP').item.json.user.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "token",
+              "displayName": "token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ip",
+              "displayName": "ip",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        -352
+      ],
+      "id": "a12e0982-83f5-4cc0-80d2-7bd65060ace3",
+      "name": "Call 'Laravel token Sub Flow New Version'",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Laravel LoginForm UI": {
+      "main": [
+        [
+          {
+            "node": "LognFormValues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datatabel Central Settings": {
+      "main": [
+        [
+          {
+            "node": "Retrieve central settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve central settings": {
+      "main": [
+        [
+          {
+            "node": "Send HTTP Request to Laravel Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LognFormValues": {
+      "main": [
+        [
+          {
+            "node": "Datatabel Central Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Token Present": {
+      "main": [
+        [
+          {
+            "node": "Send Token and IP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Failure Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Token and IP": {
+      "main": [
+        [
+          {
+            "node": "Call 'Laravel token Sub Flow New Version'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check IP Address": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Send HTTP Request to Laravel Backend": {
+      "main": [
+        [
+          {
+            "node": "IF Token Present",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Failure Notification": {
+      "main": [
+        [
+          {
+            "node": "Failure Insertion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Failure Insertion": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "db471847-e598-4f8e-ad18-bb74787ff7d2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "OkUdfAuw91fH6XEn",
+  "tags": []
+}
