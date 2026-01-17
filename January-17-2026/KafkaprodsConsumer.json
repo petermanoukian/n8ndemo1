@@ -1,0 +1,252 @@
+{
+  "name": "KafkaprodsConsumer",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kafkaprod",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -32
+      ],
+      "id": "395fd25c-6141-4c15-b31b-d8e3730743b4",
+      "name": "Webhook",
+      "webhookId": "eab9343e-8d27-4841-9396-856e8f005394"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "prodscommon",
+          "mode": "list",
+          "cachedResultName": "prodscommon"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "originid": "={{ $json.body.data.id }}",
+            "catid": "={{ $json.body.data.catid }}",
+            "name": "={{ $json.body.data.name }}",
+            "des": "={{ $json.body.data.des }}",
+            "dess": "={{ $json.body.data.dess }}",
+            "filer": "={{ $json.body.data.file_url }}",
+            "filename": "={{ $json.body.data.filename }}",
+            "mime": "={{ $json.body.data.mime }}",
+            "sizer": "={{ $json.body.data.sizer }}",
+            "extension": "={{ $json.body.data.des }}",
+            "img": "={{ $json.body.data.img }}",
+            "img2": "={{ $json.body.data.img2 }}",
+            "created_at": "={{ $json.body.data.created_at }}",
+            "updated_at": "={{ $json.body.data.updated_at }}",
+            "eventtype": "={{ $json.body.event }}",
+            "id": 0
+          },
+          "matchingColumns": [
+            "originid"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originid",
+              "displayName": "originid",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "catid",
+              "displayName": "catid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "des",
+              "displayName": "des",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "dess",
+              "displayName": "dess",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "filer",
+              "displayName": "filer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "filename",
+              "displayName": "filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "mime",
+              "displayName": "mime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "sizer",
+              "displayName": "sizer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "extension",
+              "displayName": "extension",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "img",
+              "displayName": "img",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "img2",
+              "displayName": "img2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "eventtype",
+              "displayName": "eventtype",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        144,
+        -32
+      ],
+      "id": "5a660ed0-b531-4194-bf55-159c99a3e9ab",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "f7su0gJJ2XtAeA9K",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a525e81-21ab-42d1-9e46-aa76266497b6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "SfhdTZoOZaBSDlga",
+  "tags": []
+}

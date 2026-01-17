@@ -1,0 +1,134 @@
+{
+  "name": "RabbitMQCatsCosumer",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Item coming from RabbitMQ Trigger\nconst message = $json;\n\n// Safety check\nif (!message.content) {\n  throw new Error('RabbitMQ message has no content field');\n}\n\n// Extract only the cat payload\nconst cat = message.content;\n\n// Optional: normalize timestamps for MongoDB\ncat.created_at = new Date(cat.created_at);\ncat.updated_at = new Date(cat.updated_at);\n\n// Optional: add ingestion metadata\ncat._source = 'rabbitmq';\ncat._ingested_at = new Date();\n\nreturn [\n  {\n    json: cat\n  }\n];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -80
+      ],
+      "id": "670ac285-6f59-4014-a496-5c7b5be5510b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "queue": "cats_queue_n8n",
+        "options": {
+          "jsonParseBody": true,
+          "parallelMessages": -1
+        }
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -80
+      ],
+      "id": "3d702649-9766-4232-bcb4-60c8697483e1",
+      "name": "RabbitMQ Trigger",
+      "retryOnFail": true,
+      "credentials": {
+        "rabbitmq": {
+          "id": "MiKufuukJz6bzWLR",
+          "name": "RabbitMQ account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "cats",
+        "fields": "=Event:{{ $json.event }}\nid:{{ $json.id }}\nName:{{ $json.name }}\nFilename:{{ $json.filename }}\nFile:{{ $json.file }}\nFileUrl:{{ $json.file_url }}\nMime:{{ $json.mime }}\nSize:{{ $json.sizer }}\nFileExtension: {{ $json.extension }}\nShortDetails: {{ $json.des }}\nLargeDetails:{{ $json.dess }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        -144
+      ],
+      "id": "b9483ae7-8422-4aab-b241-027a4f5d9870",
+      "name": "Insert documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "ju9YHGkqETrSNMfR",
+          "name": "MongoDB account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "RabbitMQ Trigger": [
+      {
+        "json": {
+          "fields": {
+            "consumerTag": "amq.ctag-pkg_s0Yf5dJcVm5i2Wd_Nw",
+            "deliveryTag": 1,
+            "redelivered": false,
+            "exchange": "",
+            "routingKey": "cats_queue_n8n"
+          },
+          "properties": {
+            "contentType": "application/json",
+            "deliveryMode": 2
+          },
+          "content": {
+            "event": "cat.added",
+            "id": 330,
+            "name": "cat2",
+            "filename": null,
+            "file": null,
+            "file_url": "http://localhost:8001/",
+            "mime": null,
+            "sizer": null,
+            "extension": null,
+            "des": "fghgh",
+            "dess": null,
+            "created_at": "2025-12-27T13:28:48.000000Z",
+            "updated_at": "2025-12-27T13:28:50.064880Z"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c7fc797-78ae-4f75-935b-15f2f06b86d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4884815bbcc111ec230f3722427cc2a84933b1649d66b9f23727be8f059e58b4"
+  },
+  "id": "xGAsFIy8re8eCj9N",
+  "tags": []
+}
